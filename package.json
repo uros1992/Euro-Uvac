@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && npm run build:server",
+    "build": "vite build",
     "build:server": "esbuild server.ts --platform=node --target=node22 --bundle --format=cjs --outfile=dist/server.cjs --external:express --external:nodemailer --external:vite",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist",
