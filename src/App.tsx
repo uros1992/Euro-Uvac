@@ -44,6 +44,14 @@ import BookingModal from './components/BookingModal';
 import AdminDashboard from './components/AdminDashboard';
 import ReviewSection from './components/ReviewSection';
 
+// Image imports
+import uvacHeroImg from './assets/uvac-hero.jpg';
+import vultureImg from './assets/vulture.jpg';
+import viewpointsImg from './assets/viewpoints.jpg';
+import iceCaveImg from './assets/ice-cave.jpg';
+import mapaImg from './assets/mapa.png';
+import tourVideo from './assets/tour-video.mp4';
+
 const translations = {
   sr: {
     nav: { tours: "Tura", experience: "Iskustvo", reviews: "Recenzije", location: "Kako do nas", book: "Rezerviši", profileTitle: "Moje rezervacije / Admin", myBookings: "Moje rezervacije" },
@@ -404,7 +412,7 @@ export default function App() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="/uvac-hero.jpg" 
+            src={uvacHeroImg} 
             alt="Uvac River Meanders" 
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -459,17 +467,17 @@ export default function App() {
               {
                 title: t.usp.f1Title,
                 desc: t.usp.f1Desc,
-                image: "/vulture.jpg"
+                image: vultureImg
               },
               {
                 title: t.usp.f2Title,
                 desc: t.usp.f2Desc,
-                image: "/viewpoints.jpg"
+                image: viewpointsImg
               },
               {
                 title: t.usp.f3Title,
                 desc: t.usp.f3Desc,
-                image: "/ice-cave.jpg"
+                image: iceCaveImg
               }
             ].map((feature, idx) => (
               <motion.div 
@@ -509,7 +517,7 @@ export default function App() {
               <div className="sm:w-2/5 relative overflow-hidden bg-white h-64 sm:h-auto">
                 <div className="absolute inset-0 p-2 sm:p-4">
                   <video 
-                    src="/tour-video.mp4" 
+                    src={tourVideo} 
                     autoPlay 
                     muted 
                     playsInline 
@@ -639,7 +647,7 @@ export default function App() {
               {/* Photo of the road/dock */}
               <div className="rounded-3xl overflow-hidden relative shadow-md">
                 <img 
-                  src="/mapa.png" 
+                  src={mapaImg} 
                   alt="Scenic Route to Uvac" 
                   className="w-full h-auto block"
                   referrerPolicy="no-referrer"
