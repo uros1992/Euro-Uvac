@@ -486,6 +486,8 @@ export default function App() {
                   alt={feature.title} 
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                 
@@ -647,6 +649,8 @@ export default function App() {
                   alt="Scenic Route to Uvac" 
                   className="w-full h-auto block"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
                   <p className="text-white font-medium flex items-center gap-2 z-10">
