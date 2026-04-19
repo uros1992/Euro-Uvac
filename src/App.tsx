@@ -407,7 +407,7 @@ export default function App() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://github.com/user-attachments/assets/c25efce2-b13d-45a0-9323-0f97ee9d9405" 
+            src="https://github.com/user-attachments/assets/2535ee17-e2fa-415b-949b-6d2692c58099" 
             referrerPolicy="no-referrer"
             alt="Uvac River Meanders" 
             className="w-full h-full object-cover"
@@ -463,17 +463,17 @@ export default function App() {
               {
                 title: t.usp.f1Title,
                 desc: t.usp.f1Desc,
-                image: "https://github.com/user-attachments/assets/2695a433-16ff-49d0-8796-539e597cff4f"
+                image: "https://github.com/user-attachments/assets/5a361a17-3296-4c98-895a-46a1b9aab25b"
               },
               {
                 title: t.usp.f2Title,
                 desc: t.usp.f2Desc,
-                image: "https://github.com/user-attachments/assets/fd7c320d-db3b-4eeb-a580-c86d2c212551"
+                image: "https://github.com/user-attachments/assets/b28eed85-f6ec-4dab-afef-a8d6bc871d7b"
               },
               {
                 title: t.usp.f3Title,
                 desc: t.usp.f3Desc,
-                image: "https://github.com/user-attachments/assets/b4610442-0c29-4bde-a7b6-4830f56363ab"
+                image: "https://github.com/user-attachments/assets/f4f43ab0-2fa6-4887-aa2e-5c95e0face5b"
               }
             ].map((feature, idx) => (
               <motion.div 
@@ -513,7 +513,7 @@ export default function App() {
               <div className="sm:w-2/5 relative overflow-hidden bg-white h-64 sm:h-auto">
                 <div className="absolute inset-0 p-2 sm:p-4">
                   <video 
-                    src="https://github.com/user-attachments/assets/2901e8da-e646-4363-9128-3aba80786072" 
+                    src="https://github.com/user-attachments/assets/bbb75732-fcb0-4104-b5bb-0ac38e494f65" 
                     autoPlay 
                     muted 
                     playsInline 
@@ -643,7 +643,7 @@ export default function App() {
               {/* Photo of the road/dock */}
               <div className="rounded-3xl overflow-hidden relative shadow-md">
                 <img 
-                  src="https://github.com/user-attachments/assets/4c507830-819a-4944-919b-10410fce8cac" 
+                  src="https://github.com/user-attachments/assets/8f7c713f-3758-438c-8dca-94b6c507aaeb" 
                   alt="Scenic Route to Uvac" 
                   className="w-full h-auto block"
                   referrerPolicy="no-referrer"
