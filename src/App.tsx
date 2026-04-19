@@ -45,12 +45,7 @@ import AdminDashboard from './components/AdminDashboard';
 import ReviewSection from './components/ReviewSection';
 
 // Image imports
-import uvacHeroImg from './assets/uvac-hero.jpg';
-import vultureImg from './assets/vulture.jpg';
-import viewpointsImg from './assets/viewpoints.jpg';
-import iceCaveImg from './assets/ice-cave.jpg';
-import mapaImg from './assets/mapa.png';
-import tourVideo from './assets/tour-video.mp4';
+// Assets loaded externally via GitHub CDN
 
 const translations = {
   sr: {
@@ -412,7 +407,8 @@ export default function App() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={uvacHeroImg} 
+            src="https://github.com/user-attachments/assets/c25efce2-b13d-45a0-9323-0f97ee9d9405" 
+            referrerPolicy="no-referrer"
             alt="Uvac River Meanders" 
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -467,17 +463,17 @@ export default function App() {
               {
                 title: t.usp.f1Title,
                 desc: t.usp.f1Desc,
-                image: vultureImg
+                image: "https://github.com/user-attachments/assets/2695a433-16ff-49d0-8796-539e597cff4f"
               },
               {
                 title: t.usp.f2Title,
                 desc: t.usp.f2Desc,
-                image: viewpointsImg
+                image: "https://github.com/user-attachments/assets/fd7c320d-db3b-4eeb-a580-c86d2c212551"
               },
               {
                 title: t.usp.f3Title,
                 desc: t.usp.f3Desc,
-                image: iceCaveImg
+                image: "https://github.com/user-attachments/assets/b4610442-0c29-4bde-a7b6-4830f56363ab"
               }
             ].map((feature, idx) => (
               <motion.div 
@@ -517,7 +513,7 @@ export default function App() {
               <div className="sm:w-2/5 relative overflow-hidden bg-white h-64 sm:h-auto">
                 <div className="absolute inset-0 p-2 sm:p-4">
                   <video 
-                    src={tourVideo} 
+                    src="https://github.com/user-attachments/assets/2901e8da-e646-4363-9128-3aba80786072" 
                     autoPlay 
                     muted 
                     playsInline 
@@ -647,7 +643,7 @@ export default function App() {
               {/* Photo of the road/dock */}
               <div className="rounded-3xl overflow-hidden relative shadow-md">
                 <img 
-                  src={mapaImg} 
+                  src="https://github.com/user-attachments/assets/4c507830-819a-4944-919b-10410fce8cac" 
                   alt="Scenic Route to Uvac" 
                   className="w-full h-auto block"
                   referrerPolicy="no-referrer"
