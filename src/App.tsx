@@ -407,7 +407,7 @@ export default function App() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://github.com/user-attachments/assets/2535ee17-e2fa-415b-949b-6d2692c58099" 
+            src="https://github.com/user-attachments/assets/36975e49-01dc-41da-9685-8e93624b6553" 
             referrerPolicy="no-referrer"
             alt="Uvac River Meanders" 
             className="w-full h-full object-cover"
@@ -468,12 +468,12 @@ export default function App() {
               {
                 title: t.usp.f2Title,
                 desc: t.usp.f2Desc,
-                image: "https://github.com/user-attachments/assets/b28eed85-f6ec-4dab-afef-a8d6bc871d7b"
+                image: "https://github.com/user-attachments/assets/a8364b80-6410-4010-a44a-bbda9007bb81"
               },
               {
                 title: t.usp.f3Title,
                 desc: t.usp.f3Desc,
-                image: "https://github.com/user-attachments/assets/f4f43ab0-2fa6-4887-aa2e-5c95e0face5b"
+                image: "https://github.com/user-attachments/assets/95429ea9-ee11-4240-ad5d-c5a2426be6ac"
               }
             ].map((feature, idx) => (
               <motion.div 
@@ -515,7 +515,7 @@ export default function App() {
               <div className="sm:w-2/5 relative overflow-hidden bg-white h-64 sm:h-auto">
                 <div className="absolute inset-0 p-2 sm:p-4">
                   <video 
-                    src="https://github.com/user-attachments/assets/bbb75732-fcb0-4104-b5bb-0ac38e494f65" 
+                    src="https://github.com/user-attachments/assets/046d90db-b572-4995-9cd5-380ef57027ca" 
                     autoPlay 
                     muted 
                     playsInline 
