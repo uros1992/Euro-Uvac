@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "Reservation": {
+      "title": "Reservation",
+      "description": "A booking reservation",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "seats": { "type": "array", "items": { "type": "number" }, "maxItems": 12 },
+        "status": { "type": "string", "enum": ["confirmed", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "email", "phone", "date", "seats", "status", "createdAt"]
+    },
+    "AdminConfig": {
+      "title": "Admin",
+      "description": "Admin privileges",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" }
+      },
+      "required": ["email"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "A public customer review",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "text": { "type": "string" },
+        "rating": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "text", "rating", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/reservations/{reservationId}": {
+      "schema": { "$ref": "#/entities/Reservation" },
+      "description": "All customer reservations"
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminConfig" },
+      "description": "Admin users by their UID"
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Public customer reviews"
+    }
+  }
+}
