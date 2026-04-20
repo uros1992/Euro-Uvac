@@ -41,9 +41,11 @@ const InstagramIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-import BookingModal from './components/BookingModal';
-import AdminDashboard from './components/AdminDashboard';
-import ReviewSection from './components/ReviewSection';
+import { Suspense, lazy } from 'react';
+
+const BookingModal = lazy(() => import('./components/BookingModal'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const ReviewSection = lazy(() => import('./components/ReviewSection'));
 
 // Image imports
 // Assets loaded externally via GitHub CDN
@@ -263,7 +265,11 @@ export default function App() {
   }, []);
 
   if (isAdminRoute) {
-    return <AdminDashboard />;
+    return (
+      <Suspense fallback={<div className="h-screen flex items-center justify-center text-uvac-primary">Učitavanje...</div>}>
+        <AdminDashboard />
+      </Suspense>
+    );
   }
 
   return (
@@ -412,6 +418,7 @@ export default function App() {
             referrerPolicy="no-referrer"
             alt="Uvac River Meanders" 
             className="w-full h-full object-cover"
+            fetchPriority="high"
             onError={(e) => {
               e.currentTarget.src = "https://images.unsplash.com/photo-1610408544955-46743b1740e7?q=80&w=2070&auto=format&fit=crop";
             }}
@@ -520,8 +527,10 @@ export default function App() {
                     autoPlay 
                     muted 
                     playsInline 
+                    loop
+                    preload="none"
                     poster="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1000&auto=format&fit=crop"
-                    className="w-full h-full object-contain rounded-[1.5rem] overflow-hidden transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-contain rounded-[1.5rem] overflow-hidden transition-transform duration-700 group-hover:scale-105 bg-black"
                   />
                 </div>
               </div>
@@ -675,14 +684,16 @@ export default function App() {
       </section>
 
       {/* Reviews Section */}
-      <ReviewSection 
-        t={t.reviews} 
-        fallbackReviews={[
-          { id: '1', name: t.reviews.r1Name, text: t.reviews.r1Text, rating: 5 },
-          { id: '2', name: t.reviews.r2Name, text: t.reviews.r2Text, rating: 5 },
-          { id: '3', name: t.reviews.r3Name, text: t.reviews.r3Text, rating: 5 }
-        ]} 
-      />
+      <Suspense fallback={<div className="py-20 text-center">Učitavanje...</div>}>
+        <ReviewSection 
+          t={t.reviews} 
+          fallbackReviews={[
+            { id: '1', name: t.reviews.r1Name, text: t.reviews.r1Text, rating: 5 },
+            { id: '2', name: t.reviews.r2Name, text: t.reviews.r2Text, rating: 5 },
+            { id: '3', name: t.reviews.r3Name, text: t.reviews.r3Text, rating: 5 }
+          ]} 
+        />
+      </Suspense>
 
       {/* Social Proof / CTA */}
       <section className="py-24 bg-uvac-primary relative overflow-hidden">
@@ -770,11 +781,13 @@ export default function App() {
           </div>
         </div>
       </footer>
-      <BookingModal 
-        isOpen={isBookingOpen} 
-        onClose={() => setIsBookingOpen(false)} 
-        lang={lang} 
-      />
+      <Suspense fallback={null}>
+        <BookingModal 
+          isOpen={isBookingOpen} 
+          onClose={() => setIsBookingOpen(false)} 
+          lang={lang} 
+        />
+      </Suspense>
     </div>
   );
 }
