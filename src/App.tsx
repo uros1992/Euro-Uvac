@@ -18,7 +18,8 @@ import {
   Car,
   Navigation,
   Phone,
-  User
+  User,
+  MessageCircle
 } from 'lucide-react';
 
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -424,12 +425,12 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
+            <h2 className="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
               {t.hero.badge}
-            </span>
-            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
+            </h2>
+            <h2 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
               {t.hero.title}
-            </h1>
+            </h2>
             <p className="text-lg md:text-2xl text-white/90 mb-10 font-light max-w-2xl mx-auto">
               {t.hero.subtitle}
             </p>
@@ -622,6 +623,15 @@ export default function App() {
                   <Phone className="w-5 h-5" />
                   {t.location.callSupport}
                 </a>
+                <a 
+                  href="https://wa.me/381658862760" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-4 rounded-xl font-bold transition-colors shadow-sm"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  WhatsApp
+                </a>
               </div>
             </div>
 
@@ -741,10 +751,21 @@ export default function App() {
           </div>
           <div>
             <h4 className="text-white font-bold mb-4">{t.footer.contactTitle}</h4>
-            <ul className="space-y-2">
-              <li>milivoje.ciro@gmail.com</li>
-              <li>+381 65 886 2760</li>
-              <li>{t.footer.c1}</li>
+            <ul className="space-y-3">
+              <li><a href="mailto:milivoje.ciro@gmail.com" className="hover:text-white transition-colors">milivoje.ciro@gmail.com</a></li>
+              <li className="flex items-center gap-3">
+                <a href="tel:+381658862760" className="hover:text-white transition-colors">+381 65 886 2760</a>
+                <a 
+                  href="https://wa.me/381658862760" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-[#25D366] hover:bg-[#20bd5a] text-white p-1 rounded-full transition-colors flex items-center justify-center"
+                  title="WhatsApp"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                </a>
+              </li>
+              <li className="text-gray-400">{t.footer.c1}</li>
             </ul>
           </div>
         </div>
