@@ -530,7 +530,7 @@ export default function App() {
                     loop
                     preload="none"
                     poster="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1000&auto=format&fit=crop"
-                    className="w-full h-full object-contain rounded-[1.5rem] overflow-hidden transition-transform duration-700 group-hover:scale-105 bg-black"
+                    className="w-full h-full object-contain rounded-[1.5rem] overflow-hidden transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
               </div>
