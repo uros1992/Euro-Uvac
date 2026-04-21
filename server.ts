@@ -88,6 +88,28 @@ async function startServer() {
     }
   });
 
+  app.get("/robots.txt", (req, res) => {
+    res.type("text/plain");
+    res.sendFile(
+      path.join(
+        process.cwd(),
+        process.env.NODE_ENV === "production" ? "dist" : "public",
+        "robots.txt"
+      )
+    );
+  });
+
+  app.get("/sitemap.xml", (req, res) => {
+    res.type("application/xml");
+    res.sendFile(
+      path.join(
+        process.cwd(),
+        process.env.NODE_ENV === "production" ? "dist" : "public",
+        "sitemap.xml"
+      )
+    );
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
