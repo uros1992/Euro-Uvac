@@ -90,24 +90,32 @@ async function startServer() {
 
   app.get("/robots.txt", (req, res) => {
     res.type("text/plain");
-    res.sendFile(
-      path.join(
-        process.cwd(),
-        process.env.NODE_ENV === "production" ? "dist" : "public",
-        "robots.txt"
-      )
-    );
+    res.send("User-agent: *\nAllow: /\nSitemap: https://euro-uvac.onrender.com/sitemap.xml\n");
   });
 
   app.get("/sitemap.xml", (req, res) => {
     res.type("application/xml");
-    res.sendFile(
-      path.join(
-        process.cwd(),
-        process.env.NODE_ENV === "production" ? "dist" : "public",
-        "sitemap.xml"
-      )
-    );
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://euro-uvac.onrender.com/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://euro-uvac.onrender.com/#tours</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://euro-uvac.onrender.com/#about</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://euro-uvac.onrender.com/#location</loc>
+    <priority>0.8</priority>
+  </url>
+</urlset>`);
   });
 
   // Vite middleware for development
