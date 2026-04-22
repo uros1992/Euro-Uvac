@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
-  Bird, 
-  Camera, 
-  Map, 
-  ShieldCheck, 
   Star, 
+  Map,
   Clock, 
   Users, 
   CheckCircle2, 
@@ -58,8 +55,7 @@ const translations = {
       title: "Doživite netaknutu lepotu Uvca",
       subtitle: "Krstarite veličanstvenim meandrima, istražite skrivenu ledenu pećinu i posmatrajte let retkog beloglavog supa.",
       checkAvail: "Proveri dostupnost",
-      viewTours: "Pogledaj ponudu ture",
-      reviews: "4.9/5 od 2.000+ recenzija"
+      viewTours: "Pogledaj ponudu ture"
     },
     usp: {
       title: "Zašto krstariti sa nama?",
@@ -84,15 +80,7 @@ const translations = {
       t1F2: "Poseta Ledenoj pećini",
       t1F3: "Pešačenje do vidikovca",
       t1F4: "Posmatranje beloglavih supova",
-      selectDate: "Izaberi datum",
-      t2Title: "Zora za fotografe",
-      t2Price: "€65",
-      t2Unit: "/osobi",
-      t2Duration: "4 Sata",
-      t2Max: "Zlatni sat",
-      t2F1: "Polazak rano ujutru",
-      t2F2: "Pešačenje do vidikovca Molitva",
-      t2F3: "Produženo vreme za fotografisanje ptica"
+      selectDate: "Izaberi datum"
     },
     reviews: {
       title: "Šta kažu naši gosti",
@@ -151,8 +139,7 @@ const translations = {
       title: "Experience the Untouched Beauty of Uvac",
       subtitle: "Cruise through majestic meanders, explore hidden ice cave, and witness the flight of the rare Griffon Vulture.",
       checkAvail: "Check Availability",
-      viewTours: "View Tour Option",
-      reviews: "4.9/5 from 2,000+ reviews"
+      viewTours: "View Tour Option"
     },
     usp: {
       title: "Why Cruise With Us?",
@@ -177,15 +164,7 @@ const translations = {
       t1F2: "Ice Cave visit",
       t1F3: "Hiking to the viewpoint",
       t1F4: "Griffon Vulture spotting",
-      selectDate: "Select Date",
-      t2Title: "Photographer's Dawn",
-      t2Price: "€65",
-      t2Unit: "/pp",
-      t2Duration: "4 Hours",
-      t2Max: "Golden Hour",
-      t2F1: "Early morning departure",
-      t2F2: "Hike to Molitva viewpoint",
-      t2F3: "Extended time for bird photography"
+      selectDate: "Select Date"
     },
     reviews: {
       title: "What Our Guests Say",
