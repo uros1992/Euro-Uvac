@@ -448,11 +448,7 @@ export default function App() {
         </div>
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
             <h2 className="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
               {t.hero.badge}
             </h2>
@@ -474,7 +470,7 @@ export default function App() {
                 {t.hero.viewTours}
               </a>
             </div>
-          </motion.div>
+          </div>
         </div>
 
       </section>
