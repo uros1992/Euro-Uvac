@@ -438,6 +438,8 @@ export default function App() {
             alt="Uvac River Meanders" 
             className="w-full h-full object-cover"
             fetchPriority="high"
+            loading="eager"
+            decoding="sync"
             onError={(e) => {
               e.currentTarget.src = "https://images.unsplash.com/photo-1610408544955-46743b1740e7?q=80&w=2070&auto=format&fit=crop";
             }}
