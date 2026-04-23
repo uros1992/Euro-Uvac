@@ -636,7 +636,7 @@ export default function App() {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <a 
-                  href="https://maps.google.com/?q=Uvac+brana" 
+                  href="https://www.google.com/maps?q=43.41859265482159,19.926836899441174" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-uvac-dark px-6 py-4 rounded-xl font-bold transition-colors border border-gray-100 shadow-sm"
@@ -668,7 +668,7 @@ export default function App() {
               {/* Google Map Embed */}
               <div className="bg-white rounded-3xl overflow-hidden h-[400px] border border-stone-200 relative shadow-inner">
                 <iframe 
-                  src="https://maps.google.com/maps?q=Uvac+brana&t=&z=14&ie=UTF8&iwloc=&output=embed" 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2898.018849082935!2d19.926278999999997!3d43.41843289999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4757efaea5130991%3A0x2b36bb83993b9c02!2sKrstarenje%20Euro%20Uvac!5e0!3m2!1ssr!2srs!4v1776958686675!5m2!1ssr!2srs" 
                   width="100%" 
                   height="100%" 
                   style={{ border: 0 }} 
@@ -676,7 +676,7 @@ export default function App() {
                   loading="lazy" 
                   referrerPolicy="no-referrer-when-downgrade"
                   className="absolute inset-0"
-                  title="Uvac Map"
+                  title="Euro Uvac Map"
                 ></iframe>
               </div>
               
