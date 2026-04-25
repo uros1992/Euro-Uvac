@@ -681,7 +681,7 @@ export default function App() {
               {/* Photo of the road/dock - Placeholder for User's Upload */}
               <div className="rounded-3xl overflow-hidden relative shadow-md aspect-video">
                 <img 
-                  src="/moj-uvac.jpg" 
+                  src="https://github.com/user-attachments/assets/07baae8d-ac57-46d5-8da0-6a179ef5bf42" 
                   alt="Scenic Route to Uvac" 
                   className="w-full h-full object-cover block"
                   referrerPolicy="no-referrer"
