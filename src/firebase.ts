@@ -7,7 +7,7 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services with experimentalForceLongPolling to avoid transport errors in proxy environments
 export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
+  experimentalAutoDetectLongPolling: true,
 }, firebaseConfig.firestoreDatabaseId);
 
 export const auth = getAuth(app);

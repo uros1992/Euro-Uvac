@@ -132,7 +132,7 @@ const translations = {
       openMap: "Otvori na Google Mapi",
       callSupport: "Pozovite za pomoć",
       bookTour: "Rezervišite turu",
-      scenicRoute: "Ruta do rezervata"
+      scenicRoute: "Avantura je tu!"
     },
     cta: {
       title: "Spremni za vrhunac vašeg putovanja po Srbiji?",
@@ -216,7 +216,7 @@ const translations = {
       openMap: "Open in Google Maps",
       callSupport: "Call for Support",
       bookTour: "Book a Tour",
-      scenicRoute: "Scenic route to the reserve"
+      scenicRoute: "Adventure is here!"
     },
     cta: {
       title: "Ready for the highlight of your Serbian trip?",
@@ -664,7 +664,7 @@ export default function App() {
             {/* Right Column: Map and Photo */}
             <div className="space-y-6">
               {/* Google Map Embed */}
-              <div className="bg-white rounded-3xl overflow-hidden h-[400px] border border-stone-200 relative shadow-inner">
+              <div className="bg-white rounded-3xl overflow-hidden aspect-video border border-stone-200 relative shadow-inner">
                 <iframe 
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2898.018849082935!2d19.926278999999997!3d43.41843289999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4757efaea5130991%3A0x2b36bb83993b9c02!2sKrstarenje%20Euro%20Uvac!5e0!3m2!1ssr!2srs!4v1776958686675!5m2!1ssr!2srs" 
                   width="100%" 
@@ -678,12 +678,12 @@ export default function App() {
                 ></iframe>
               </div>
               
-              {/* Photo of the road/dock */}
-              <div className="rounded-3xl overflow-hidden relative shadow-md">
+              {/* Photo of the road/dock - Placeholder for User's Upload */}
+              <div className="rounded-3xl overflow-hidden relative shadow-md aspect-video">
                 <img 
-                  src="https://github.com/user-attachments/assets/8f7c713f-3758-438c-8dca-94b6c507aaeb" 
+                  src="/moj-uvac.jpg" 
                   alt="Scenic Route to Uvac" 
-                  className="w-full h-auto block"
+                  className="w-full h-full object-cover block"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                   decoding="async"
