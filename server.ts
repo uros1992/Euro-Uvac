@@ -9,6 +9,14 @@ async function startServer() {
   
   app.use(express.json());
 
+  // Redirect from old Render domain to custom domain
+  app.use((req, res, next) => {
+    if (req.hostname === 'euro-uvac.onrender.com') {
+      return res.redirect(301, 'https://uvacgriffon.rs' + req.originalUrl);
+    }
+    next();
+  });
+
   // Email route
   app.post("/api/send-email", async (req, res) => {
     try {
