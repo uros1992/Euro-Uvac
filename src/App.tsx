@@ -671,7 +671,7 @@ export default function App() {
                   loading="lazy" 
                   referrerPolicy="no-referrer-when-downgrade"
                   className="absolute inset-0"
-                  title="Euro Uvac Map"
+                  title="Uvac Griffon Map"
                 ></iframe>
               </div>
               
