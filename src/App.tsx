@@ -278,7 +278,7 @@ export default function App() {
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img src="https://github.com/user-attachments/assets/0cbb5cb3-798f-4d61-af30-0f58a9f0aac3" alt="Uvac Griffon Logo" className="h-20 sm:h-24 w-auto object-contain rounded-full drop-shadow-md" />
+            <img src="https://github.com/user-attachments/assets/1f050848-fab5-4f3d-b571-384321754808" alt="Uvac Griffon Logo" className="h-20 sm:h-24 w-auto object-contain rounded-full drop-shadow-md" />
           </div>
           
           {/* Desktop Nav */}
@@ -749,7 +749,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <img src="https://github.com/user-attachments/assets/0cbb5cb3-798f-4d61-af30-0f58a9f0aac3" alt="Uvac Griffon Logo" className="h-20 sm:h-24 w-auto object-contain rounded-full" />
+              <img src="https://github.com/user-attachments/assets/1f050848-fab5-4f3d-b571-384321754808" alt="Uvac Griffon Logo" className="h-20 sm:h-24 w-auto object-contain rounded-full" />
             </div>
             <p className="max-w-sm mb-6">{t.footer.desc}</p>
             <div className="flex gap-4">
