@@ -278,10 +278,7 @@ export default function App() {
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Anchor className={`w-8 h-8 ${isScrolled ? 'text-uvac-primary' : 'text-white'}`} />
-            <span className={`font-serif font-bold text-2xl tracking-tight ${isScrolled ? 'text-uvac-dark' : 'text-white'}`}>
-              Euro Uvac
-            </span>
+            <img src="/logo.png" alt="Uvac Griffon Logo" className="h-20 sm:h-24 w-auto object-contain rounded-full drop-shadow-md" />
           </div>
           
           {/* Desktop Nav */}
@@ -752,8 +749,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <Anchor className="w-6 h-6 text-uvac-accent" />
-              <span className="font-serif font-bold text-xl text-white">Euro Uvac</span>
+              <img src="/logo.png" alt="Uvac Griffon Logo" className="h-20 sm:h-24 w-auto object-contain rounded-full" />
             </div>
             <p className="max-w-sm mb-6">{t.footer.desc}</p>
             <div className="flex gap-4">
