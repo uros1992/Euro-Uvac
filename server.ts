@@ -57,7 +57,6 @@ const app = express();
                   pass: process.env.SMTP_PASS,
                },
                tls: {
-                  ciphers: 'SSLv3',
                   rejectUnauthorized: false
                },
                connectionTimeout: 15000, 
