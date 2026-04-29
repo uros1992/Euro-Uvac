@@ -4,7 +4,8 @@ import path from "path";
 import nodemailer from "nodemailer";
 
 async function startServer() {
-  const app = express();
+  // Dual-language email support enabled (SR/EN)
+const app = express();
   const PORT = 3000;
   
   app.use(express.json());
