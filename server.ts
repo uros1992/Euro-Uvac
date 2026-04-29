@@ -42,15 +42,24 @@ const app = express();
       let isMock = false;
 
       if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-         console.log("Using provided SMTP configuration");
+         const port = Number(process.env.SMTP_PORT) || 587;
+         console.log("Using provided SMTP configuration:", {
+            host: process.env.SMTP_HOST,
+            port: port,
+            user: process.env.SMTP_USER,
+            secure: port === 465
+         });
          transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
-            port: Number(process.env.SMTP_PORT) || 587,
-            secure: Number(process.env.SMTP_PORT) === 465,
+            port: port,
+            secure: port === 465, 
             auth: {
                user: process.env.SMTP_USER,
                pass: process.env.SMTP_PASS,
             },
+            tls: {
+              rejectUnauthorized: false // Helps with various hosting setups
+            }
          });
       } else {
          console.log("No SMTP config found, using Ethereal mock account");
@@ -128,24 +137,35 @@ const app = express();
           </div>
       `;
       
-      const info = await transporter.sendMail({
-        from: process.env.SMTP_FROM || '"Euro Uvac Booking" <no-reply@eurouvac.com>', 
-        to: to, 
-        subject: subject, 
-        html: emailHtml
-      });
+      try {
+        const info = await transporter.sendMail({
+          from: process.env.SMTP_FROM || '"Uvac Griffon Booking" <no-reply@uvacgriffon.rs>', 
+          to: to, 
+          subject: subject, 
+          html: emailHtml
+        });
 
-      // Ethereal automatically provides a URL to preview the fake email without a real inbox!
-      let previewUrl = null;
-      if (isMock) {
-        previewUrl = nodemailer.getTestMessageUrl(info);
-        console.log("Email sent! Preview URL: %s", previewUrl);
+        console.log("Email sent successfully! MessageId:", info.messageId);
+        
+        // Ethereal preview URL
+        let previewUrl = null;
+        if (isMock) {
+          previewUrl = nodemailer.getTestMessageUrl(info);
+          console.log("Review Ethereal email at:", previewUrl);
+        }
+        
+        res.json({ success: true, previewUrl });
+      } catch (mailError) {
+        console.error("FATAL: SMTP Error while sending mail:", mailError);
+        res.status(500).json({ 
+          success: false, 
+          error: "Slanje mejla nije uspelo. Proverite serverske logove.",
+          details: mailError instanceof Error ? mailError.message : String(mailError)
+        });
       }
-      
-      res.json({ success: true, previewUrl });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: "Failed to send email" });
+      console.error("General error in email route:", error);
+      res.status(500).json({ success: false, error: "Internal server error" });
     }
   });
 
