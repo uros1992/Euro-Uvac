@@ -42,7 +42,9 @@ const translations = {
     signInToConfirm: "Sign in with Google to Book",
     signingIn: "Signing in...",
     processing: "Processing...",
-    bookWhatsApp: "Book via WhatsApp"
+    bookWhatsApp: "Book via WhatsApp",
+    saveHistory: "Want to save your booking history?",
+    signInToSave: "Sign in with Google"
   },
   sr: {
     title: "Rezervišite vašu avanturu",
@@ -75,7 +77,9 @@ const translations = {
     signInToConfirm: "Prijavi se putem Google-a",
     signingIn: "Prijava...",
     processing: "Obrađuje se...",
-    bookWhatsApp: "Rezerviši putem WhatsApp-a"
+    bookWhatsApp: "Rezerviši putem WhatsApp-a",
+    saveHistory: "Želite da sačuvate istoriju vaših rezervacija?",
+    signInToSave: "Prijavi se putem Google-a"
   }
 };
 
@@ -200,8 +204,8 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
 
   const submitBooking = async (overrideUser?: any) => {
     const currentUser = (overrideUser && typeof overrideUser.uid === 'string') ? overrideUser : user;
-    if (!selectedFullDate || !currentUser || !currentUser.uid) {
-      console.error("Missing required data for booking:", { selectedFullDate, currentUser });
+    if (!selectedFullDate) {
+      console.error("Missing selected date");
       return;
     }
     setIsSubmitting(true);
@@ -211,11 +215,12 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
       const reservationId = Date.now().toString() + Math.floor(Math.random() * 1000);
       
       const newReservation = {
-        userId: currentUser.uid,
+        userId: currentUser?.uid || `guest_${reservationId}`,
         date: new Date(Date.UTC(selectedFullDate.getFullYear(), selectedFullDate.getMonth(), selectedFullDate.getDate())).toISOString(),
         seats: selectedSeats,
         status: 'confirmed',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        isGuest: !currentUser
       };
       
       const batch = writeBatch(db);
@@ -264,10 +269,6 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
     try {
       const u = await signInWithGoogle();
       setUser(u);
-      // Automatically attempt to submit booking if we're on the confirmation step
-      if (step === 4) {
-        await submitBooking(u);
-      }
     } catch (err: any) {
       console.error("Auth error:", err);
       if (err.code !== 'auth/popup-closed-by-user') {
@@ -559,40 +560,44 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                   </div>
                 )}
 
-                <div className="mt-8 space-y-3">
-                  {!user ? (
-                    <button 
-                      disabled={isSubmitting}
-                      onClick={handleAuth}
-                      className="w-full bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-200 py-4 rounded-xl font-bold text-lg transition-all shadow-md flex items-center justify-center gap-3"
-                    >
-                      <img src="https://www.google.com/favicon.ico" alt="" className="w-5 h-5" />
-                      {isSubmitting ? t.signingIn : t.signInToConfirm}
-                    </button>
-                  ) : (
-                    <button 
-                      disabled={isSubmitting}
-                      onClick={() => submitBooking()}
-                      className="w-full bg-uvac-primary hover:bg-uvac-dark disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2"
-                    >
-                      {isSubmitting ? t.processing : <>{t.confirmBtn} <CheckCircle2 className="w-5 h-5" /></>}
-                    </button>
+                <div className="mt-8 space-y-4">
+                  <button 
+                    disabled={isSubmitting}
+                    onClick={() => submitBooking()}
+                    className="w-full bg-uvac-primary hover:bg-uvac-dark disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? t.processing : <>{t.confirmBtn} <CheckCircle2 className="w-5 h-5" /></>}
+                  </button>
+
+                  {!user && !isSubmitting && (
+                    <div className="pt-4 border-t border-gray-100 flex flex-col items-center gap-3">
+                      <p className="text-xs text-gray-500 font-medium text-center">{t.saveHistory}</p>
+                      <button 
+                        onClick={handleAuth}
+                        className="flex items-center gap-2 text-sm font-bold text-gray-700 hover:text-uvac-primary transition-colors"
+                      >
+                        <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
+                        {t.signInToSave}
+                      </button>
+                    </div>
                   )}
                   
                   {!isSubmitting && (
-                    <a 
-                      href={`https://wa.me/381658862760?text=${encodeURIComponent(
-                        lang === 'sr' 
-                        ? `Zdravo, želim da rezervišem turu za ${selectedSeats.length} osoba dana ${selectedFullDate.toLocaleDateString('sr-RS')}.`
-                        : `Hello, I'd like to book a tour for ${selectedSeats.length} guests on ${selectedFullDate.toLocaleDateString('en-US')}.`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full flex items-center justify-center gap-2 text-green-600 font-bold py-2 hover:bg-green-50 rounded-lg transition-colors text-sm"
-                    >
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="" className="w-4 h-4" />
-                      {t.bookWhatsApp}
-                    </a>
+                    <div className={!user ? "pt-2" : "pt-0"}>
+                      <a 
+                        href={`https://wa.me/381658862760?text=${encodeURIComponent(
+                          lang === 'sr' 
+                          ? `Zdravo, želim da rezervišem turu za ${selectedSeats.length} osoba dana ${selectedFullDate.toLocaleDateString('sr-RS')}.`
+                          : `Hello, I'd like to book a tour for ${selectedSeats.length} guests on ${selectedFullDate.toLocaleDateString('en-US')}.`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-center gap-2 text-green-600 font-bold py-2 hover:bg-green-50 rounded-lg transition-colors text-sm"
+                      >
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="" className="w-4 h-4" />
+                        {t.bookWhatsApp}
+                      </a>
+                    </div>
                   )}
                 </div>
               </motion.div>

@@ -15,14 +15,14 @@ service cloud.firestore {
 
     function isValidReservation(data) {
       return data.keys().hasAll(['userId', 'date', 'seats', 'status', 'createdAt'])
-        && data.keys().size() == 5
+        && (data.keys().size() == 5 || (data.keys().size() == 6 && data.keys().hasAny(['isGuest'])))
         && data.userId is string && data.userId.size() <= 128
-        && data.userId == request.auth.uid
         && data.date is string && data.date.size() <= 50
         && data.seats is list && data.seats.size() <= 12
         && (data.seats.size() == 0 || data.seats[0] is number)
         && data.status is string && data.status.size() <= 20
-        && data.status in ['confirmed', 'cancelled'];
+        && data.status in ['confirmed', 'cancelled']
+        && (request.auth == null || data.userId == request.auth.uid || isAdmin() || (data.keys().hasAll(['isGuest']) && data.isGuest == true));
     }
 
     function isCancelAction() {
@@ -49,7 +49,7 @@ service cloud.firestore {
       // Base docs are safely readable because they contain no PII, allowing calendar availability functions
       allow read: if true; 
 
-      allow create: if isSignedIn() && isValidId(reservationId) && isValidReservation(incoming());
+      allow create: if isValidId(reservationId) && isValidReservation(incoming());
 
       allow update: if isSignedIn() && isValidId(reservationId) 
         && (
@@ -66,7 +66,7 @@ service cloud.firestore {
       // Protect PII strictly
       match /details/info {
          allow read: if isSignedIn() && (isAdmin() || get(/databases/$(database)/documents/reservations/$(reservationId)).data.userId == request.auth.uid);
-         allow create: if isSignedIn() 
+         allow create: if (isSignedIn() || true) 
             && incoming().keys().hasAll(['name', 'email', 'phone'])
             && incoming().name is string
             && incoming().email is string
