@@ -49,13 +49,19 @@ const app = express();
          
          if (isGmail) {
             transporter = nodemailer.createTransport({
-               service: 'gmail',
+               host: 'smtp.gmail.com',
+               port: 587,
+               secure: false, // Port 587 koristi STARTTLS, pa secure mora biti false
                auth: {
                   user: process.env.SMTP_USER,
                   pass: process.env.SMTP_PASS,
                },
-               connectionTimeout: 10000, 
-               greetingTimeout: 10000,
+               tls: {
+                  ciphers: 'SSLv3',
+                  rejectUnauthorized: false
+               },
+               connectionTimeout: 15000, 
+               greetingTimeout: 15000,
             });
          } else {
             const port = Number(process.env.SMTP_PORT) || 587;
