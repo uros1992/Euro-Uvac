@@ -74,7 +74,7 @@ const translations = {
     hero: {
       badge: "SRPSKO ČUDO PRIRODE",
       title: "Doživite netaknutu lepotu Uvca",
-      subtitle: "Krstarite veličanstvenim meandrima, istražite skrivenu ledenu pećinu i posmatrajte let retkog beloglavog supa.",
+      subtitle: "Krstarite veličanstvenim meandrima Uvca, istražite skrivenu Ledenu pećinu i posmatrajte let retkog beloglavog supa. Sezona maj–oktobar 2026. | Polasci svaki dan u 13:00h, osim ponedeljka.",
       checkAvail: "Proveri dostupnost",
       viewTours: "Pogledaj ponudu ture"
     },
@@ -158,7 +158,7 @@ const translations = {
     hero: {
       badge: "SERBIA'S NATURAL WONDER",
       title: "Experience the Untouched Beauty of Uvac",
-      subtitle: "Cruise through majestic meanders, explore hidden ice cave, and witness the flight of the rare Griffon Vulture.",
+      subtitle: "Cruise through majestic meanders of Uvac, explore hidden Ice Cave, and witness the flight of the rare Griffon Vulture. Season May–October 2026 | Departures every day at 13:00, except Monday.",
       checkAvail: "Check Availability",
       viewTours: "View Tour Option"
     },
