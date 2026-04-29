@@ -21,7 +21,16 @@ async function startServer() {
   app.post("/api/send-email", async (req, res) => {
     try {
       console.log("Received send-email request:", req.body);
-      const { to, name, date, seats } = req.body;
+      console.log("Starting email sending process...");
+      console.log("SMTP Config present:", {
+        host: !!process.env.SMTP_HOST,
+        user: !!process.env.SMTP_USER,
+        pass: !!process.env.SMTP_PASS,
+        from: !!process.env.SMTP_FROM
+      });
+
+      const { to, name, date, seats, lang } = req.body;
+      const isSerbian = lang === 'sr';
 
       if (!to || typeof to !== 'string' || to.trim() === '') {
         console.error("Error: Missing recipient email (to)");
@@ -32,7 +41,7 @@ async function startServer() {
       let isMock = false;
 
       if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-         // Use real SMTP provider
+         console.log("Using provided SMTP configuration");
          transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
             port: Number(process.env.SMTP_PORT) || 587,
@@ -43,49 +52,86 @@ async function startServer() {
             },
          });
       } else {
-         // Auto-generate test account for Ethereal (Fake SMTP for development/testing)
+         console.log("No SMTP config found, using Ethereal mock account");
          isMock = true;
          const testAccount = await nodemailer.createTestAccount();
          transporter = nodemailer.createTransport({
             host: "smtp.ethereal.email",
             port: 587,
-            secure: false, // true for 465, false for other ports
+            secure: false, 
             auth: {
-              user: testAccount.user, // generated ethereal user
-              pass: testAccount.pass, // generated ethereal password
+               user: testAccount.user,
+               pass: testAccount.pass,
             },
          });
       }
 
-      let formattedDate = date;
+      let formattedDateSr = date;
+      let formattedDateEn = date;
+      
       if (date && date.includes('-')) {
         const [year, month, day] = date.split('-');
         const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-        const monthName = dateObj.toLocaleString('en-US', { month: 'long' });
-        formattedDate = `${parseInt(day)} ${monthName} ${year}, 13:00 PM`;
+        formattedDateSr = `${parseInt(day)}. ${dateObj.toLocaleString('sr-RS', { month: 'long' })} ${year}, 13:00č`;
+        formattedDateEn = `${parseInt(day)} ${dateObj.toLocaleString('en-US', { month: 'long' })} ${year}, 1:00 PM`;
       } else {
-        formattedDate = new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) + ", 13:00 PM";
+        const d = new Date(date);
+        formattedDateSr = d.toLocaleDateString('sr-RS', { day: 'numeric', month: 'long', year: 'numeric' }) + ", 13:00č";
+        formattedDateEn = d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) + ", 1:00 PM";
       }
 
+      const subject = "Vaša rezervacija je potvrđena! / Your Booking is Confirmed! - Uvac Griffon";
+      
+      const emailHtml = `
+          <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+            <!-- SERBIAN VERSION -->
+            <div style="background-color: #0369a1; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+              <h1 style="color: white; margin: 0;">Uvac Griffon Avantura</h1>
+            </div>
+            <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
+              <h2 style="color: #0369a1;">Rezervacija potvrđena! ✅</h2>
+              <p>Zdravo <strong>${name}</strong>,</p>
+              <p>Vaša avantura na Uvcu je uspešno rezervisana. Detalji vaše rezervacije:</p>
+              <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${formattedDateSr}</p>
+                <p style="margin: 5px 0;"><strong>👥 Osoba:</strong> ${seats}</p>
+                <p style="margin: 5px 0;"><strong>📍 Mesto polaska:</strong> Brana HE "Uvac", Akmačići</p>
+              </div>
+              <p>Plaćanje se vrši na licu mesta (2000 DIN po osobi + 420 DIN za ulaz u rezervat i pećinu).</p>
+              <p>Ako želite da otkažete ili promenite rezervaciju, molimo vas da nas kontaktirate putem sajta ili telefona najmanje 24h ranije.</p>
+              <p>Vidimo se na vodi!</p>
+            </div>
+
+            <div style="margin: 30px 0; border-top: 2px dashed #e5e7eb;"></div>
+
+            <!-- ENGLISH VERSION -->
+            <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;">
+              <h2 style="color: #0369a1;">Booking Confirmed! ✅</h2>
+              <p>Hello <strong>${name}</strong>,</p>
+              <p>Your Uvac adventure has been confirmed! Here are the details:</p>
+              <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 5px 0;"><strong>📅 Date:</strong> ${formattedDateEn}</p>
+                <p style="margin: 5px 0;"><strong>👥 Guests:</strong> ${seats}</p>
+                <p style="margin: 5px 0;"><strong>📍 Departure:</strong> Dam HE "Uvac", Akmačići</p>
+              </div>
+              <p>Payment is made on-site (2000 DIN per person + 420 DIN for reserve and cave entry).</p>
+              <p>If you need to manage or cancel your reservation, please do so via the website or contact us at least 24 hours prior to departure.</p>
+              <p>See you out on the water!</p>
+              
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+              <p style="font-size: 12px; color: #6b7280; text-align: center;">
+                Uvac Griffon | Akmačići, Nova Varoš<br/>
+                <a href="https://uvacgriffon.rs" style="color: #0369a1;">uvacgriffon.rs</a>
+              </p>
+            </div>
+          </div>
+      `;
+      
       const info = await transporter.sendMail({
         from: process.env.SMTP_FROM || '"Euro Uvac Booking" <no-reply@eurouvac.com>', 
         to: to, 
-        subject: "Your Booking is Confirmed!", 
-        text: `Euro Uvac Adventure\nBooking Confirmed! ✅\n\nHello ${name},\n\nYour Euro Uvac adventure has been confirmed! Here are the details:\n\n* Date: ${formattedDate}\n* Guests: ${seats}\n\nIf you need to manage or cancel your reservation (up to 24 hours prior to departure), you can do so by logging into the website.\n\nSee you out on the water!`, 
-        html: `
-          <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; color: #333;">
-            <h1 style="color: #0369a1;">Euro Uvac Adventure</h1>
-            <h2>Booking Confirmed! ✅</h2>
-            <p>Hello <strong>${name}</strong>,</p>
-            <p>Your Euro Uvac adventure has been confirmed! Here are the details:</p>
-            <ul>
-              <li><strong>Date:</strong> ${formattedDate}</li>
-              <li><strong>Guests:</strong> ${seats}</li>
-            </ul>
-            <p>If you need to manage or cancel your reservation (up to 24 hours prior to departure), you can do so by logging into the website.</p>
-            <p>See you out on the water!</p>
-          </div>
-        `, 
+        subject: subject, 
+        html: emailHtml
       });
 
       // Ethereal automatically provides a URL to preview the fake email without a real inbox!

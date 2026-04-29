@@ -233,29 +233,33 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
       
       await batch.commit();
       
-      if (formData.email && formData.email.trim() !== '') {
-        try {
-           await fetch('/api/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to: formData.email.trim(),
-                name: formData.name,
-                date: newReservation.date,
-                seats: selectedSeats.length
-              })
-           }).then(res => res.json()).then(data => {
-              if (data.success && data.previewUrl) {
-                 setFormData(prev => ({ ...prev, emailPreviewUrl: data.previewUrl }));
-              }
-           });
-        } catch(e) {
-           console.error("Email send failed:", e);
-        }
-      }
-      
+      // Move to success step immediately so user isn't blocked by email sending
       setIsSubmitting(false);
-      handleNext(); // Move to success step
+      handleNext();
+      
+      if (formData.email && formData.email.trim() !== '') {
+        // Send email in background
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: formData.email.trim(),
+            name: formData.name,
+            date: newReservation.date,
+            seats: selectedSeats.length,
+            lang: lang
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.previewUrl) {
+             setFormData(prev => ({ ...prev, emailPreviewUrl: data.previewUrl }));
+          }
+        })
+        .catch(e => {
+           console.error("Email send failed:", e);
+        });
+      }
     } catch(err: any) {
       console.error("Error creating reservation:", err);
       setError(lang === 'sr' ? "Došlo je do greške prilikom čuvanja rezervacije. Proverite internet vezu i pokušajte ponovo." : "There was an error securing your reservation. Please check your connection and try again.");
