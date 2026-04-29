@@ -42,25 +42,38 @@ const app = express();
       let isMock = false;
 
       if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-         const port = Number(process.env.SMTP_PORT) || 587;
-         console.log("Using provided SMTP configuration:", {
-            host: process.env.SMTP_HOST,
-            port: port,
-            user: process.env.SMTP_USER,
-            secure: port === 465
-         });
-         transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: port,
-            secure: port === 465, 
-            auth: {
-               user: process.env.SMTP_USER,
-               pass: process.env.SMTP_PASS,
-            },
-            tls: {
-              rejectUnauthorized: false // Helps with various hosting setups
-            }
-         });
+         const host = process.env.SMTP_HOST.toLowerCase();
+         const isGmail = host.includes('gmail.com');
+         
+         console.log(`Initializing transporter for ${isGmail ? 'Gmail' : host}...`);
+         
+         if (isGmail) {
+            transporter = nodemailer.createTransport({
+               service: 'gmail',
+               auth: {
+                  user: process.env.SMTP_USER,
+                  pass: process.env.SMTP_PASS,
+               },
+               connectionTimeout: 10000, // 10 seconds
+               greetingTimeout: 10000,
+            });
+         } else {
+            const port = Number(process.env.SMTP_PORT) || 587;
+            transporter = nodemailer.createTransport({
+               host: process.env.SMTP_HOST,
+               port: port,
+               secure: port === 465, 
+               auth: {
+                  user: process.env.SMTP_USER,
+                  pass: process.env.SMTP_PASS,
+               },
+               tls: {
+                 rejectUnauthorized: false 
+               },
+               connectionTimeout: 10000,
+               greetingTimeout: 10000,
+            });
+         }
       } else {
          console.log("No SMTP config found, using Ethereal mock account");
          isMock = true;
