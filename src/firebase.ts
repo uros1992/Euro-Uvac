@@ -24,17 +24,19 @@ export const signInWithGoogle = async () => {
     return result.user;
   } catch (error: any) {
     if (error?.code === 'auth/popup-closed-by-user') {
-      console.log("Prijava otkazana od strane korisnika.");
       return null;
     }
     
-    console.error("Greška pri prijavi sa Google-om:", error);
+    console.error("Detaljna greška pri prijavi:", error);
+    const errorCode = error?.code || 'nepoznato';
+    const errorMessage = error?.message || 'Nema dodatnih informacija';
     
-    // U AI Studio iframe okruženju, popupi su nekad blokirani
-    if (error?.code === 'auth/popup-blocked' || error?.message?.includes('blocked')) {
-      alert("Prozor za prijavu je blokiran. Molimo vas da dozvolite pop-up prozore ili otvorite aplikaciju u novom tabu (ikona u gornjem desnom uglu).");
+    if (error?.code === 'auth/popup-blocked') {
+      alert("Prozor za prijavu je blokiran. Molimo vas da dozvolite pop-up prozore u pretraživaču ili otvorite aplikaciju u novom tabu.");
+    } else if (error?.code === 'auth/unauthorized-domain') {
+      alert(`Ovaj domen nije ovlašćen u Firebase konzoli. Greška: ${errorCode}`);
     } else {
-      alert("Došlo je do greške pri prijavi. Preporučujemo da otvorite aplikaciju u novom tabu.");
+      alert(`Greška pri prijavi: ${errorCode}\n\nPoruka: ${errorMessage}\n\nPreporuka: Otvorite aplikaciju u novom tabu koristeći ikonicu u gornjem desnom uglu.`);
     }
     
     return null;
