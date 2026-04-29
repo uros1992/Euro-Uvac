@@ -29,7 +29,8 @@ const translations = {
     summary: "Booking Summary",
     date: "Date",
     guests: "Guests",
-    total: "Total Price",
+    total: "Payment",
+    paymentNote: "Payment is made on-site",
     confirmBtn: "Confirm Booking",
     successTitle: "Booking Confirmed!",
     successMsg: "We can't wait to see you. A confirmation email has been sent with all the details.",
@@ -38,7 +39,10 @@ const translations = {
     seatAvailable: "Available",
     seatSelected: "Selected",
     seatTaken: "Taken",
-    pricePerPerson: 35
+    signInToConfirm: "Sign in with Google to Book",
+    signingIn: "Signing in...",
+    processing: "Processing...",
+    bookWhatsApp: "Book via WhatsApp"
   },
   sr: {
     title: "Rezervišite vašu avanturu",
@@ -58,7 +62,8 @@ const translations = {
     summary: "Detalji rezervacije",
     date: "Datum",
     guests: "Broj osoba",
-    total: "Ukupna cena",
+    total: "Plaćanje",
+    paymentNote: "Plaćanje se vrši na licu mesta",
     confirmBtn: "Potvrdi rezervaciju",
     successTitle: "Rezervacija potvrđena!",
     successMsg: "Jedva čekamo da vas ugostimo. Poslali smo vam email sa svim detaljima.",
@@ -67,7 +72,10 @@ const translations = {
     seatAvailable: "Slobodno",
     seatSelected: "Izabrano",
     seatTaken: "Zauzeto",
-    pricePerPerson: 35
+    signInToConfirm: "Prijavi se putem Google-a",
+    signingIn: "Prijava...",
+    processing: "Obrađuje se...",
+    bookWhatsApp: "Rezerviši putem WhatsApp-a"
   }
 };
 
@@ -83,10 +91,20 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
   
   const [user, setUser] = useState(auth.currentUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [reservations, setReservations] = useState<any[]>([]);
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged(u => setUser(u));
+    const unsub = auth.onAuthStateChanged(u => {
+      setUser(u);
+      if (u) {
+        setFormData(prev => ({
+          ...prev,
+          name: prev.name || u.displayName || '',
+          email: prev.email || u.email || '',
+        }));
+      }
+    });
     return () => unsub();
   }, []);
 
@@ -121,6 +139,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
       setSelectedFullDate(null);
       setSelectedDateAvail(0);
       setSelectedSeats([]);
+      setError(null);
       setFormData({ name: '', email: '', phone: '', emailPreviewUrl: '' });
     }
   }, [isOpen]);
@@ -179,26 +198,20 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
     }
   };
 
-  const submitBooking = async () => {
-    if (!selectedFullDate) return;
-    setIsSubmitting(true);
-    let currentUser = user;
-    if (!currentUser) {
-      try {
-        currentUser = await signInWithGoogle();
-        setUser(currentUser);
-      } catch (err) {
-        console.error(err);
-        setIsSubmitting(false);
-        return; // User aborted login
-      }
+  const submitBooking = async (overrideUser?: any) => {
+    const currentUser = (overrideUser && typeof overrideUser.uid === 'string') ? overrideUser : user;
+    if (!selectedFullDate || !currentUser || !currentUser.uid) {
+      console.error("Missing required data for booking:", { selectedFullDate, currentUser });
+      return;
     }
+    setIsSubmitting(true);
+    setError(null);
     
     try {
       const reservationId = Date.now().toString() + Math.floor(Math.random() * 1000);
       
       const newReservation = {
-        userId: currentUser?.uid,
+        userId: currentUser.uid,
         date: new Date(Date.UTC(selectedFullDate.getFullYear(), selectedFullDate.getMonth(), selectedFullDate.getDate())).toISOString(),
         seats: selectedSeats,
         status: 'confirmed',
@@ -215,31 +228,51 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
       
       await batch.commit();
       
-      try {
-         const resp = await fetch('/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              to: formData.email,
-              name: formData.name,
-              date: newReservation.date,
-              seats: selectedSeats.length
-            })
-         });
-         const data = await resp.json();
-         if (data.success && data.previewUrl) {
-            // we attach it directly onto the form data to show in step 5
-            setFormData(prev => ({ ...prev, emailPreviewUrl: data.previewUrl }));
-         }
-      } catch(e) {
-         console.error("Email send failed:", e);
+      if (formData.email && formData.email.trim() !== '') {
+        try {
+           await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: formData.email.trim(),
+                name: formData.name,
+                date: newReservation.date,
+                seats: selectedSeats.length
+              })
+           }).then(res => res.json()).then(data => {
+              if (data.success && data.previewUrl) {
+                 setFormData(prev => ({ ...prev, emailPreviewUrl: data.previewUrl }));
+              }
+           });
+        } catch(e) {
+           console.error("Email send failed:", e);
+        }
       }
       
       setIsSubmitting(false);
       handleNext(); // Move to success step
-    } catch(err) {
+    } catch(err: any) {
       console.error("Error creating reservation:", err);
-      alert("There was an error securing your reservation. Please try again or contact us.");
+      setError(lang === 'sr' ? "Došlo je do greške prilikom čuvanja rezervacije. Proverite internet vezu i pokušajte ponovo." : "There was an error securing your reservation. Please check your connection and try again.");
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAuth = async () => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const u = await signInWithGoogle();
+      setUser(u);
+      // Automatically attempt to submit booking if we're on the confirmation step
+      if (step === 4) {
+        await submitBooking(u);
+      }
+    } catch (err: any) {
+      console.error("Auth error:", err);
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError(lang === 'sr' ? "Greška prilikom prijave. Proverite da li su pop-up prozori dozvoljeni." : "Sign-in error. Please ensure pop-ups are allowed.");
+      }
       setIsSubmitting(false);
     }
   };
@@ -471,7 +504,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
 
                 <div className="mt-8">
                   <button 
-                    disabled={!formData.name || !formData.email || !formData.phone}
+                    disabled={!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()}
                     onClick={handleNext}
                     className="w-full bg-uvac-accent hover:bg-[#c49363] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg"
                   >
@@ -500,27 +533,67 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-4">
                   <h5 className="font-bold text-uvac-dark border-b border-gray-200 pb-2 mb-4">{t.summary}</h5>
                   
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">{t.date}</span>
                     <span className="font-semibold text-gray-800 capitalize">
                       {selectedFullDate.toLocaleDateString(lang === 'sr' ? 'sr-RS' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">{t.guests}</span>
                     <span className="font-semibold text-gray-800">{selectedSeats.length}</span>
                   </div>
+
+                  <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-4 mt-2">
+                    <span className="text-gray-500 font-bold">{t.total}</span>
+                    <span className="font-bold text-uvac-primary text-sm text-right">
+                      {t.paymentNote}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="mt-8">
-                  <button 
-                    disabled={isSubmitting}
-                    onClick={submitBooking}
-                    className="w-full bg-uvac-primary hover:bg-uvac-dark disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2"
-                  >
-                    {isSubmitting ? 'Processing...' : <>{t.confirmBtn} <CheckCircle2 className="w-5 h-5" /></>}
-                  </button>
+                {error && (
+                  <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100">
+                    {error}
+                  </div>
+                )}
+
+                <div className="mt-8 space-y-3">
+                  {!user ? (
+                    <button 
+                      disabled={isSubmitting}
+                      onClick={handleAuth}
+                      className="w-full bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-200 py-4 rounded-xl font-bold text-lg transition-all shadow-md flex items-center justify-center gap-3"
+                    >
+                      <img src="https://www.google.com/favicon.ico" alt="" className="w-5 h-5" />
+                      {isSubmitting ? t.signingIn : t.signInToConfirm}
+                    </button>
+                  ) : (
+                    <button 
+                      disabled={isSubmitting}
+                      onClick={() => submitBooking()}
+                      className="w-full bg-uvac-primary hover:bg-uvac-dark disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? t.processing : <>{t.confirmBtn} <CheckCircle2 className="w-5 h-5" /></>}
+                    </button>
+                  )}
+                  
+                  {!isSubmitting && (
+                    <a 
+                      href={`https://wa.me/381658862760?text=${encodeURIComponent(
+                        lang === 'sr' 
+                        ? `Zdravo, želim da rezervišem turu za ${selectedSeats.length} osoba dana ${selectedFullDate.toLocaleDateString('sr-RS')}.`
+                        : `Hello, I'd like to book a tour for ${selectedSeats.length} guests on ${selectedFullDate.toLocaleDateString('en-US')}.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full flex items-center justify-center gap-2 text-green-600 font-bold py-2 hover:bg-green-50 rounded-lg transition-colors text-sm"
+                    >
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="" className="w-4 h-4" />
+                      {t.bookWhatsApp}
+                    </a>
+                  )}
                 </div>
               </motion.div>
             )}

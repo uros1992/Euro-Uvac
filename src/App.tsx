@@ -92,9 +92,9 @@ const translations = {
       title: "Vaša avantura",
       subtitle: "Doživite Uvac i njegove meandre, posetite Ledenu pećinu i uživajte u jednom od najlepših pogleda u Srbiji. Krstarenja su dostupna tokom sezone od 1. maja do 31. oktobra, uz svakodnevne polaske u 13:00 časova (osim ponedeljkom).",
       t1Title: "Spremni za avanturu?",
-      t1Price: "2000 RSD",
-      t1OldPrice: "€45",
-      t1Unit: "/osobi",
+      t1Price: "2000 DIN",
+      t1Unit: "/osobi*",
+      priceDisclaimer: "* Ulaz u rezervat i Ledenu pećinu naplaćuje se dodatno (420 din) na licu mesta.",
       t1Duration: "4-5 Sati",
       t1Max: "Maks. 12",
       t1F1: "Krstarenje meandrima",
@@ -176,9 +176,9 @@ const translations = {
       title: "Your Adventure",
       subtitle: "Experience Uvac and its meanders, visit the Ice Cave and enjoy one of the most beautiful views in Serbia. Cruises are available during the season from May 1 to October 31, with daily departures at 1:00 p.m. (except Mondays).",
       t1Title: "Ready for adventure?",
-      t1Price: "2000 RSD",
-      t1OldPrice: "€45",
-      t1Unit: "/pp",
+      t1Price: "2000 DIN",
+      t1Unit: "/pp*",
+      priceDisclaimer: "* Reserve entry and Ice Cave fee is charged separately (420 din) on-site.",
       t1Duration: "4-5 Hours",
       t1Max: "Max 12",
       t1F1: "Cruise through the meanders",
@@ -293,17 +293,17 @@ export default function App() {
                 href="https://www.facebook.com/p/Euro-Uvac-Krstarenje-meandrima-Uvca-100071051771543/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className={`transition-colors flex items-center justify-center p-2 rounded-full ${isScrolled ? 'text-gray-500 hover:text-[#1877F2] hover:bg-gray-100' : 'text-white/90 hover:text-white hover:bg-white/10'}`}
+                className={`transition-colors flex items-center justify-center p-2 rounded-full ${isScrolled ? 'text-gray-500 hover:text-[#1877F2] hover:bg-gray-100' : 'text-white/90 hover:text-[#1877F2] hover:bg-white/10'}`}
                 aria-label="Facebook"
               >
                 <FacebookIcon className="w-5 h-5" />
               </a>
 
               <a 
-                href="https://instagram.com/eurouvac_krstarenje" 
+                href="https://instagram.com/uvacgriffon_krstarenje" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className={`transition-colors flex items-center justify-center p-2 rounded-full ${isScrolled ? 'text-gray-500 hover:text-[#E4405F] hover:bg-gray-100' : 'text-white/90 hover:text-white hover:bg-white/10'}`}
+                className={`transition-colors flex items-center justify-center p-2 rounded-full ${isScrolled ? 'text-gray-500 hover:text-[#E4405F] hover:bg-gray-100' : 'text-white/90 hover:text-[#E4405F] hover:bg-white/10'}`}
                 aria-label="Instagram"
               >
                 <InstagramIcon className="w-5 h-5" />
@@ -392,7 +392,7 @@ export default function App() {
                 <FacebookIcon className="w-6 h-6" />
               </a>
               <a 
-                href="https://instagram.com/eurouvac_krstarenje" 
+                href="https://instagram.com/uvacgriffon_krstarenje" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-[#E4405F] flex items-center justify-center p-2"
@@ -552,12 +552,16 @@ export default function App() {
                 <div>
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-2xl font-serif font-bold text-uvac-dark">{t.tours.t1Title}</h3>
+                    <div className="text-right">
+                      <div className="text-uvac-primary font-bold text-xl">{t.tours.t1Price}</div>
+                      <div className="text-gray-500 text-xs">{t.tours.t1Unit}</div>
+                    </div>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
                     <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {t.tours.t1Duration}</span>
                     <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {t.tours.t1Max}</span>
                   </div>
-                  <ul className="space-y-2 mb-8">
+                  <ul className="space-y-2 mb-4">
                     {[t.tours.t1F1, t.tours.t1F2, t.tours.t1F3, t.tours.t1F4].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-gray-700 text-sm">
                         <CheckCircle2 className="w-5 h-5 text-uvac-accent shrink-0" />
@@ -565,6 +569,9 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
+                  <p className="text-[10px] text-gray-400 italic mb-6 leading-tight">
+                    {t.tours.priceDisclaimer}
+                  </p>
                 </div>
                 <button 
                   onClick={() => setIsBookingOpen(true)}
@@ -757,19 +764,19 @@ export default function App() {
                 href="https://www.facebook.com/p/Euro-Uvac-Krstarenje-meandrima-Uvca-100071051771543/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-[#1877F2] hover:border-[#1877F2] text-white transition-colors"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-[#1877F2] hover:bg-white/10 transition-colors"
                 aria-label="Facebook"
               >
                 <FacebookIcon className="w-6 h-6" />
               </a>
               <a 
-                href="https://instagram.com/eurouvac_krstarenje" 
+                href="https://instagram.com/uvacgriffon_krstarenje" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:text-white group transition-all overflow-hidden"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-[#E4405F] hover:bg-white/10 transition-colors"
                 aria-label="Instagram"
               >
-                <InstagramIcon className="w-6 h-6 transition-colors group-hover:insta-colored" />
+                <InstagramIcon className="w-6 h-6" />
               </a>
             </div>
           </div>

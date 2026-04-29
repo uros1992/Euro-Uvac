@@ -20,7 +20,13 @@ async function startServer() {
   // Email route
   app.post("/api/send-email", async (req, res) => {
     try {
+      console.log("Received send-email request:", req.body);
       const { to, name, date, seats } = req.body;
+
+      if (!to || typeof to !== 'string' || to.trim() === '') {
+        console.error("Error: Missing recipient email (to)");
+        return res.status(400).json({ success: false, error: "Recipient email (to) is required" });
+      }
       
       let transporter: nodemailer.Transporter;
       let isMock = false;
