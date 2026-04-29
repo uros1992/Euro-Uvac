@@ -446,12 +446,12 @@ export default function App() {
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
           <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
-            <h2 className="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
+            <p className="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
               {t.hero.badge}
-            </h2>
-            <h2 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
+            </p>
+            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
               {t.hero.title}
-            </h2>
+            </h1>
             <p className="text-lg md:text-2xl text-white/90 mb-10 font-light max-w-2xl mx-auto">
               {t.hero.subtitle}
             </p>
