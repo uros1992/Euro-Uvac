@@ -54,7 +54,7 @@ const app = express();
                   user: process.env.SMTP_USER,
                   pass: process.env.SMTP_PASS,
                },
-               connectionTimeout: 10000, // 10 seconds
+               connectionTimeout: 10000, 
                greetingTimeout: 10000,
             });
          } else {
@@ -73,6 +73,16 @@ const app = express();
                connectionTimeout: 10000,
                greetingTimeout: 10000,
             });
+         }
+
+         // Verify connection configuration
+         try {
+           console.log("Verifying SMTP connection...");
+           await transporter.verify();
+           console.log("SMTP connection verified successfully!");
+         } catch (vhError) {
+           console.error("SMTP Verification Failed:", vhError);
+           // We continue, but this error will be visible in logs
          }
       } else {
          console.log("No SMTP config found, using Ethereal mock account");
@@ -151,8 +161,10 @@ const app = express();
       `;
       
       try {
+        const fromAddress = process.env.SMTP_FROM || (process.env.SMTP_USER ? `"Uvac Griffon" <${process.env.SMTP_USER}>` : '"Uvac Griffon Booking" <no-reply@uvacgriffon.rs>');
+        
         const info = await transporter.sendMail({
-          from: process.env.SMTP_FROM || '"Uvac Griffon Booking" <no-reply@uvacgriffon.rs>', 
+          from: fromAddress, 
           to: to, 
           subject: subject, 
           html: emailHtml
