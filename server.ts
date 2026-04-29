@@ -51,7 +51,7 @@ const app = express();
             transporter = nodemailer.createTransport({
                host: 'smtp.gmail.com',
                port: 587,
-               secure: false, // Port 587 koristi STARTTLS, pa secure mora biti false
+               secure: false,
                auth: {
                   user: process.env.SMTP_USER,
                   pass: process.env.SMTP_PASS,
@@ -61,6 +61,7 @@ const app = express();
                },
                connectionTimeout: 15000, 
                greetingTimeout: 15000,
+               family: 4 // Force IPv4 to avoid ENETUNREACH in some cloud environments
             });
          } else {
             const port = Number(process.env.SMTP_PORT) || 587;
