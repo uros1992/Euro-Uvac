@@ -353,7 +353,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                       <ChevronLeft className="w-5 h-5 text-gray-600" />
                     </button>
                     <div className="text-center font-bold text-gray-700 capitalize">
-                      {viewDate.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US', { month: 'long', year: 'numeric' })}
+                      {viewDate.toLocaleString(lang === 'sr' ? 'sr-Latn-RS' : 'en-US', { month: 'long', year: 'numeric' })}
                     </div>
                     <button onClick={handleNextMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors">
                       <ChevronRight className="w-5 h-5 text-gray-600" />
@@ -547,7 +547,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">{t.date}</span>
                     <span className="font-semibold text-gray-800 capitalize">
-                      {selectedFullDate.toLocaleDateString(lang === 'sr' ? 'sr-RS' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {selectedFullDate.toLocaleDateString(lang === 'sr' ? 'sr-Latn-RS' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </span>
                   </div>
                   

@@ -1,7 +1,6 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import nodemailer from "nodemailer";
 import { Resend } from "resend";
 
 async function startServer() {
@@ -34,20 +33,10 @@ async function startServer() {
   // Email route
   app.post("/api/send-email", async (req, res) => {
     try {
-      console.log("Received send-email request:", req.body);
-      console.log("Starting email sending process...");
-      console.log("SMTP Config present:", {
-        host: !!process.env.SMTP_HOST,
-        user: !!process.env.SMTP_USER,
-        pass: !!process.env.SMTP_PASS,
-        from: !!process.env.SMTP_FROM
-      });
-
       const { to, name, date, seats, lang } = req.body;
       const isSerbian = lang === 'sr';
 
       if (!to || typeof to !== 'string' || to.trim() === '') {
-        console.error("Error: Missing recipient email (to)");
         return res.status(400).json({ success: false, error: "Recipient email (to) is required" });
       }
       

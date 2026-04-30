@@ -5,9 +5,9 @@ import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase services with experimentalForceLongPolling to avoid transport errors in proxy environments
+// Initialize Firebase services with experimentalForceLongPolling to avoid transport errors in restricted network environments
 export const db = initializeFirestore(app, {
-  experimentalAutoDetectLongPolling: true,
+  experimentalForceLongPolling: true,
 }, firebaseConfig.firestoreDatabaseId);
 
 export const auth = getAuth(app);
