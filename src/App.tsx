@@ -96,7 +96,7 @@ const translations = {
     tours: {
       title: "Vaša avantura",
       subtitle: "Doživite Uvac i njegove meandre, posetite Ledenu pećinu i uživajte u jednom od najlepših pogleda u Srbiji. Krstarenja su dostupna tokom sezone od 1. maja do 31. oktobra, uz svakodnevne polaske u 13:00 časova (osim ponedeljkom). Cena: 2000 RSD po osobi — rezervacija obavezna zbog ograničenog broja mesta.",
-      t1Title: "Spremni za avanturu?",
+      t1Title: "Krstarenje Uvcem — Kompletan doživljaj",
       t1Price: "2000 RSD",
       t1Unit: "/osobi*",
       priceDisclaimer: "* Ulaz u rezervat i Ledenu pećinu naplaćuje se dodatno (420 RSD) na licu mesta.",
@@ -180,7 +180,7 @@ const translations = {
     tours: {
       title: "Your Adventure",
       subtitle: "Experience Uvac and its meanders, visit the Ice Cave and enjoy one of the most beautiful views in Serbia. Cruises are available during the season from May 1 to October 31, with daily departures at 1:00 p.m. (except Mondays). Price: 2000 RSD per person — reservation is mandatory due to the limited number of places.",
-      t1Title: "Ready for adventure?",
+      t1Title: "Uvac Cruising — The Complete Experience",
       t1Price: "2000 RSD",
       t1Unit: "/pp*",
       priceDisclaimer: "* Reserve entry and Ice Cave fee is charged separately (420 RSD) on-site.",
