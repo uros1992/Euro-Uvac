@@ -2,12 +2,25 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 async function startServer() {
   // Dual-language email support enabled (SR/EN)
-const app = express();
+  const app = express();
   const PORT = 3000;
   
+  // Lazy init Resend
+  let resendClient: Resend | null = null;
+  const getResend = () => {
+    if (!resendClient) {
+      if (!process.env.RESEND_API_KEY) {
+        throw new Error("RESEND_API_KEY is missing in environment variables");
+      }
+      resendClient = new Resend(process.env.RESEND_API_KEY);
+    }
+    return resendClient;
+  };
+
   app.use(express.json());
 
   // Redirect from old Render domain to custom domain
@@ -38,72 +51,7 @@ const app = express();
         return res.status(400).json({ success: false, error: "Recipient email (to) is required" });
       }
       
-      let transporter: nodemailer.Transporter;
-      let isMock = false;
-
-      if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-         const host = process.env.SMTP_HOST.toLowerCase();
-         const isGmail = host.includes('gmail.com');
-         
-         console.log(`Initializing transporter for ${isGmail ? 'Gmail' : host}...`);
-         
-         if (isGmail) {
-            transporter = nodemailer.createTransport({
-               host: 'smtp.gmail.com',
-               port: 587,
-               secure: false,
-               auth: {
-                  user: process.env.SMTP_USER,
-                  pass: process.env.SMTP_PASS,
-               },
-               tls: {
-                  rejectUnauthorized: false
-               },
-               connectionTimeout: 15000, 
-               greetingTimeout: 15000,
-               family: 4 // Force IPv4 to avoid ENETUNREACH in some cloud environments
-            });
-         } else {
-            const port = Number(process.env.SMTP_PORT) || 587;
-            transporter = nodemailer.createTransport({
-               host: process.env.SMTP_HOST,
-               port: port,
-               secure: port === 465, 
-               auth: {
-                  user: process.env.SMTP_USER,
-                  pass: process.env.SMTP_PASS,
-               },
-               tls: {
-                 rejectUnauthorized: false 
-               },
-               connectionTimeout: 10000,
-               greetingTimeout: 10000,
-            });
-         }
-
-         // Verify connection configuration
-         try {
-           console.log("Verifying SMTP connection...");
-           await transporter.verify();
-           console.log("SMTP connection verified successfully!");
-         } catch (vhError) {
-           console.error("SMTP Verification Failed:", vhError);
-           // We continue, but this error will be visible in logs
-         }
-      } else {
-         console.log("No SMTP config found, using Ethereal mock account");
-         isMock = true;
-         const testAccount = await nodemailer.createTestAccount();
-         transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
-            secure: false, 
-            auth: {
-               user: testAccount.user,
-               pass: testAccount.pass,
-            },
-         });
-      }
+      const resend = getResend();
 
       let formattedDateSr = date;
       let formattedDateEn = date;
@@ -167,31 +115,40 @@ const app = express();
       `;
       
       try {
-        const fromAddress = process.env.SMTP_FROM || (process.env.SMTP_USER ? `"Uvac Griffon" <${process.env.SMTP_USER}>` : '"Uvac Griffon Booking" <no-reply@uvacgriffon.rs>');
+        console.log("Attempting to send email via Resend API...");
         
-        const info = await transporter.sendMail({
-          from: fromAddress, 
-          to: to, 
+        const { data, error } = await resend.emails.send({
+          from: 'Uvac Griffon <booking@uvacgriffon.rs>', // AKO NIJE VERIFIKOVAN DOMEN, OVDE STAVI 'onboarding@resend.dev'
+          to: [to], 
           subject: subject, 
           html: emailHtml
         });
 
-        console.log("Email sent successfully! MessageId:", info.messageId);
-        
-        // Ethereal preview URL
-        let previewUrl = null;
-        if (isMock) {
-          previewUrl = nodemailer.getTestMessageUrl(info);
-          console.log("Review Ethereal email at:", previewUrl);
+        if (error) {
+          console.error("Resend API Error:", error);
+          // Ako je greška zbog domena, pokušavamo sa onboarding adresom kao fallback (samo za testiranje)
+          if (error.message.includes("domain") || error.name === "validation_error") {
+             console.log("Retrying with onboarding@resend.dev fallback...");
+             const retry = await resend.emails.send({
+               from: 'Uvac Griffon <onboarding@resend.dev>',
+               to: [to],
+               subject: subject,
+               html: emailHtml
+             });
+             if (retry.error) throw new Error(retry.error.message);
+             return res.json({ success: true, id: retry.data?.id });
+          }
+          throw new Error(error.message);
         }
-        
-        res.json({ success: true, previewUrl });
-      } catch (mailError) {
-        console.error("FATAL: SMTP Error while sending mail:", mailError);
+
+        console.log("Email sent successfully! Id:", data?.id);
+        res.json({ success: true, id: data?.id });
+      } catch (mailError: any) {
+        console.error("FATAL: Resend Error while sending mail:", mailError);
         res.status(500).json({ 
           success: false, 
-          error: "Slanje mejla nije uspelo. Proverite serverske logove.",
-          details: mailError instanceof Error ? mailError.message : String(mailError)
+          error: "Slanje mejla nije uskoro. Proverite Resend nalog ili se obratite podršci.",
+          details: mailError?.message || String(mailError)
         });
       }
     } catch (error) {
