@@ -150,6 +150,9 @@ const translations = {
     footer: {
       desc: "Uvac Griffon je brend porodičnog preduzeća Euro Uvac iz Nove Varoši, osnovanog 2021. godine. Posvećeni smo organizovanju krstarenja i promociji održivog turizma u ",
       reserveLink: "Specijalnom rezervatu prirode Uvac",
+      copyright: "Uvac Griffon © 2026",
+      organizer: "Organizator krstarenja: Euro Uvac",
+      legal: "PIB: 112457556 | Matični broj: 66116204",
       linksTitle: "Brzi linkovi",
       l1: "Iskustvo",
       l2: "Tura",
@@ -235,6 +238,9 @@ const translations = {
     footer: {
       desc: "Uvac Griffon is a brand of the family company Euro Uvac from Nova Varoš, founded in 2021. We are dedicated to organizing cruises and promoting sustainable tourism in the ",
       reserveLink: "Uvac Special Nature Reserve",
+      copyright: "Uvac Griffon © 2026",
+      organizer: "Cruise Organizer: Euro Uvac",
+      legal: "VAT (PIB): 112457556 | Reg. No. (MB): 66116204",
       linksTitle: "Quick Links",
       l1: "The Experience",
       l2: "Tour",
@@ -825,6 +831,13 @@ export default function App() {
               <li className="text-gray-400">{t.footer.c1}</li>
             </ul>
           </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-8 border-t border-white/10 text-center text-sm text-gray-400">
+          <p className="mb-2 font-medium text-gray-300">{t.footer.copyright}</p>
+          <p className="mb-1">{t.footer.organizer}</p>
+          <p>{t.footer.legal}</p>
         </div>
       </footer>
       <Suspense fallback={null}>
