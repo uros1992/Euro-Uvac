@@ -148,7 +148,8 @@ const translations = {
       cancelSuffix: "."
     },
     footer: {
-      desc: "Pružamo nezaboravne ture čamcem kroz veličanstvene meandre reke Uvac od 2021. godine.",
+      desc: "Uvac Griffon je brend porodičnog preduzeća Euro Uvac iz Nove Varoši, osnovanog 2021. godine. Posvećeni smo organizovanju krstarenja i promociji održivog turizma u ",
+      reserveLink: "Specijalnom rezervatu prirode Uvac",
       linksTitle: "Brzi linkovi",
       l1: "Iskustvo",
       l2: "Tura",
@@ -232,7 +233,8 @@ const translations = {
       cancelSuffix: "."
     },
     footer: {
-      desc: "Providing unforgettable boat tours through the magnificent Uvac River meanders since 2021.",
+      desc: "Uvac Griffon is a brand of the family company Euro Uvac from Nova Varoš, founded in 2021. We are dedicated to organizing cruises and promoting sustainable tourism in the ",
+      reserveLink: "Uvac Special Nature Reserve",
       linksTitle: "Quick Links",
       l1: "The Experience",
       l2: "Tour",
@@ -763,7 +765,17 @@ export default function App() {
             <div className="flex items-center gap-2 mb-4">
               <img src="https://github.com/user-attachments/assets/0f93b148-81a2-43db-9100-6a000177c2f5" alt="Uvac Griffon Logo" className="h-14 sm:h-16 w-auto object-contain brightness-0 invert" />
             </div>
-            <p className="max-w-sm mb-6">{t.footer.desc}</p>
+            <p className="max-w-sm mb-6">
+              {t.footer.desc}
+              <a 
+                href="https://www.uvac.org.rs/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="underline hover:text-white transition-colors"
+              >
+                {t.footer.reserveLink}
+              </a>.
+            </p>
             <div className="flex gap-4">
               <a 
                 href="https://www.facebook.com/p/Euro-Uvac-Krstarenje-meandrima-Uvca-100071051771543/" 
