@@ -203,7 +203,10 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
   };
 
   const submitBooking = async (overrideUser?: any) => {
-    const currentUser = (overrideUser && typeof overrideUser.uid === 'string') ? overrideUser : user;
+    // Explicitly check current auth state just in case state is stale
+    const currentAuthUser = auth.currentUser;
+    const currentUser = (overrideUser && typeof overrideUser.uid === 'string') ? overrideUser : (currentAuthUser || user);
+    
     if (!selectedFullDate) {
       console.error("Missing selected date");
       return;
@@ -213,9 +216,12 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
     
     try {
       const reservationId = Date.now().toString() + Math.floor(Math.random() * 1000);
+      const finalUserId = currentUser?.uid || `guest_${reservationId}`;
+      
+      console.log("Submitting reservation with userId:", finalUserId);
       
       const newReservation = {
-        userId: currentUser?.uid || `guest_${reservationId}`,
+        userId: finalUserId,
         date: new Date(Date.UTC(selectedFullDate.getFullYear(), selectedFullDate.getMonth(), selectedFullDate.getDate())).toISOString(),
         seats: selectedSeats,
         status: 'confirmed',

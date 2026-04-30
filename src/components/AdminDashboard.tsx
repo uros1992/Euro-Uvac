@@ -12,14 +12,15 @@ export default function AdminDashboard() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (u) => {
       setUser(u);
-      if (u) {
+        if (u) {
         let isAdm = false;
+        const userEmail = u.email?.toLowerCase();
         try {
           // Attempt to read admin doc directly
           const adminDoc = await getDoc(doc(db, 'admins', u.uid));
           if (adminDoc.exists()) isAdm = true;
-          // Or bootstrap
-          if (u.email === 'TheMan.Uros@gmail.com') {
+          // Or bootstrap - check case-insensitive
+          if (userEmail === 'theman.uros@gmail.com') {
              await setDoc(doc(db, 'admins', u.uid), { email: u.email }, { merge: true });
              isAdm = true;
           }
@@ -52,6 +53,7 @@ export default function AdminDashboard() {
           setReservations(resWithPii);
           setLoading(false);
         }, (err) => {
+          console.error("Firestore snapshot error:", err);
           setLoading(false);
         });
         return () => unsubRes();
