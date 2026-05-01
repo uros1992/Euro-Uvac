@@ -291,7 +291,12 @@ export default function App() {
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656996/uvac-griffon.png" alt="Uvac Griffon Logo" className={`h-14 sm:h-16 w-auto object-contain transition-all duration-300 drop-shadow-md ${!isScrolled ? 'brightness-0 invert' : ''}`} />
+            <img 
+              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656996/uvac-griffon.png" 
+              alt="Uvac Griffon - Krstarenje Uvcem" 
+              className={`h-14 sm:h-16 w-auto object-contain transition-all duration-300 drop-shadow-md ${!isScrolled ? 'brightness-0 invert' : ''}`}
+              fetchPriority="high"
+            />
           </div>
           
           {/* Desktop Nav */}
@@ -442,25 +447,25 @@ export default function App() {
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
-            src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/krstarenje-uvcem-meandri.jpg" 
-            srcSet="
-              https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_600/v1777655310/krstarenje-uvcem-meandri.jpg 600w,
-              https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1200/v1777655310/krstarenje-uvcem-meandri.jpg 1200w,
-              https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/krstarenje-uvcem-meandri.jpg 1600w,
-              https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_2000/v1777655310/krstarenje-uvcem-meandri.jpg 2000w
-            "
-            sizes="100vw"
-            referrerPolicy="no-referrer"
-            alt="Uvac River Meanders" 
-            className="w-full h-full object-cover"
-            fetchPriority="high"
-            loading="eager"
-            decoding="sync"
-            onError={(e) => {
-              e.currentTarget.src = "https://images.unsplash.com/photo-1610408544955-46743b1740e7?q=80&w=2070&auto=format&fit=crop";
-            }}
-          />
+            <img 
+              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/krstarenje-uvcem-meandri.jpg" 
+              srcSet="
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_600/v1777655310/krstarenje-uvcem-meandri.jpg 600w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1200/v1777655310/krstarenje-uvcem-meandri.jpg 1200w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/krstarenje-uvcem-meandri.jpg 1600w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_2000/v1777655310/krstarenje-uvcem-meandri.jpg 2000w
+              "
+              sizes="100vw"
+              referrerPolicy="no-referrer"
+              alt="Krstarenje meandrima reke Uvac - Uvac Griffon" 
+              className="w-full h-full object-cover"
+              fetchPriority="high"
+              loading="eager"
+              decoding="sync"
+              onError={(e) => {
+                e.currentTarget.src = "https://images.unsplash.com/photo-1610408544955-46743b1740e7?q=80&w=2070&auto=format&fit=crop";
+              }}
+            />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
         </div>
         
@@ -525,7 +530,7 @@ export default function App() {
               >
                 <img 
                   src={feature.image} 
-                  alt={feature.title} 
+                  alt={idx === 0 ? "Beloglavi sup u letu iznad kanjona Uvca" : idx === 1 ? "Vidikovac Ravni Krš pogled na meandre Uvca" : "Ledeni ukrasi u Ledenoj pećini Uvac"} 
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                   loading="lazy"
@@ -706,7 +711,7 @@ export default function App() {
               <div className="rounded-3xl overflow-hidden relative shadow-md aspect-video">
                 <img 
                   src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/uvac-meandri.jpg" 
-                  alt="Scenic Route to Uvac" 
+                  alt="Put do brane Rastoke i polazišta za krstarenje Uvcem" 
                   className="w-full h-full object-cover block"
                   referrerPolicy="no-referrer"
                   loading="lazy"
@@ -776,7 +781,13 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <img src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656996/uvac-griffon.png" alt="Uvac Griffon Logo" className="h-14 sm:h-16 w-auto object-contain brightness-0 invert" />
+              <img 
+                src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656996/uvac-griffon.png" 
+                alt="Uvac Griffon" 
+                className="h-14 sm:h-16 w-auto object-contain brightness-0 invert" 
+                loading="lazy"
+                decoding="async"
+              />
             </div>
             <p className="max-w-sm mb-6">
               {t.footer.desc}
