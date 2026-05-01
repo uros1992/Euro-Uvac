@@ -443,7 +443,14 @@ export default function App() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://github.com/user-attachments/assets/36975e49-01dc-41da-9685-8e93624b6553" 
+            src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/krstarenje-uvcem-meandri.jpg" 
+            srcSet="
+              https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_600/v1777655310/krstarenje-uvcem-meandri.jpg 600w,
+              https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1200/v1777655310/krstarenje-uvcem-meandri.jpg 1200w,
+              https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/krstarenje-uvcem-meandri.jpg 1600w,
+              https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_2000/v1777655310/krstarenje-uvcem-meandri.jpg 2000w
+            "
+            sizes="100vw"
             referrerPolicy="no-referrer"
             alt="Uvac River Meanders" 
             className="w-full h-full object-cover"
