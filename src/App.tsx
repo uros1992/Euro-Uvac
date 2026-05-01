@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { 
   Star, 
@@ -258,6 +258,16 @@ export default function App() {
   const [lang, setLang] = useState<'sr' | 'en'>('sr');
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isAdminRoute, setIsAdminRoute] = useState(window.location.hash === '#admin');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -268,12 +278,45 @@ export default function App() {
   }, []);
 
   const t = translations[lang];
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && videoRef.current) {
+            videoRef.current.play().catch(() => {
+              // Handle potential play failure (e.g. if browser blocks auto-play)
+            });
+          }
+        });
+      },
+      { threshold: 0.5 } // Play when 50% of the video is visible
+    );
+
+    if (videoRef.current) {
+      observer.observe(videoRef.current);
+    }
+
+    return () => {
+      if (videoRef.current) {
+        observer.unobserve(videoRef.current);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -292,7 +335,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img 
-              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656996/uvac-griffon.png" 
+              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777656996/uvac-griffon.png" 
               alt="Uvac Griffon - Krstarenje Uvcem" 
               className={`h-14 sm:h-16 w-auto object-contain transition-all duration-300 drop-shadow-md ${!isScrolled ? 'brightness-0 invert' : ''}`}
               fetchPriority="high"
@@ -448,12 +491,11 @@ export default function App() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
             <img 
-              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/krstarenje-uvcem-meandri.jpg" 
+              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1400/v1777655310/krstarenje-uvcem-meandri.jpg" 
               srcSet="
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_600/v1777655310/krstarenje-uvcem-meandri.jpg 600w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1200/v1777655310/krstarenje-uvcem-meandri.jpg 1200w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/krstarenje-uvcem-meandri.jpg 1600w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_2000/v1777655310/krstarenje-uvcem-meandri.jpg 2000w
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_600/v1777655310/krstarenje-uvcem-meandri.jpg 600w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1000/v1777655310/krstarenje-uvcem-meandri.jpg 1000w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1400/v1777655310/krstarenje-uvcem-meandri.jpg 1400w
               "
               sizes="100vw"
               referrerPolicy="no-referrer"
@@ -470,7 +512,7 @@ export default function App() {
         </div>
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
-          <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
+          <div className="animate-in fade-in slide-in-from-bottom-3 duration-500">
             <p className="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
               {t.hero.badge}
             </p>
@@ -510,21 +552,25 @@ export default function App() {
               {
                 title: t.usp.f1Title,
                 desc: t.usp.f1Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656997/beloglavi-sup.jpg"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777656997/beloglavi-sup.jpg"
               },
               {
                 title: t.usp.f2Title,
                 desc: t.usp.f2Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655311/vidikovac-ravni-krs-uvac.jpg"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777655311/vidikovac-ravni-krs-uvac.jpg"
               },
               {
                 title: t.usp.f3Title,
                 desc: t.usp.f3Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/ledena-pecina-uvac.jpg"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777655310/ledena-pecina-uvac.jpg"
               }
             ].map((feature, idx) => (
               <motion.div 
                 key={idx}
+                initial={{ opacity: 0.8, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.1 }}
                 whileHover={{ y: -5 }}
                 className="group relative overflow-hidden rounded-2xl h-96 shadow-lg"
               >
@@ -562,13 +608,11 @@ export default function App() {
               <div className="sm:w-2/5 relative overflow-hidden bg-white h-64 sm:h-auto">
                 <div className="absolute inset-0 p-2 sm:p-4">
                   <video 
-                    src="https://res.cloudinary.com/dejmpunhb/video/upload/f_auto,q_auto,w_1600/v1777655312/uvac-krstarenje.mp4" 
-                    autoPlay 
+                    ref={videoRef}
+                    src="https://res.cloudinary.com/dejmpunhb/video/upload/f_auto,q_auto:eco,w_500/v1777655312/uvac-krstarenje.mp4" 
                     muted 
                     playsInline 
-                    loop
-                    preload="none"
-                    poster="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1000&auto=format&fit=crop"
+                    preload="auto"
                     className="w-full h-full object-contain rounded-[1.5rem] overflow-hidden transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
@@ -710,7 +754,7 @@ export default function App() {
               {/* Photo of the road/dock - Placeholder for User's Upload */}
               <div className="rounded-3xl overflow-hidden relative shadow-md aspect-video">
                 <img 
-                  src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/uvac-meandri.jpg" 
+                  src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777655310/uvac-meandri.jpg" 
                   alt="Put do brane Rastoke i polazišta za krstarenje Uvcem" 
                   className="w-full h-full object-cover block"
                   referrerPolicy="no-referrer"
@@ -782,7 +826,7 @@ export default function App() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <img 
-                src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656996/uvac-griffon.png" 
+                src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777656996/uvac-griffon.png" 
                 alt="Uvac Griffon" 
                 className="h-14 sm:h-16 w-auto object-contain brightness-0 invert" 
                 loading="lazy"
