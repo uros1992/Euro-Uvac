@@ -291,7 +291,7 @@ export default function App() {
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img src="https://github.com/user-attachments/assets/0f93b148-81a2-43db-9100-6a000177c2f5" alt="Uvac Griffon Logo" className={`h-14 sm:h-16 w-auto object-contain transition-all duration-300 drop-shadow-md ${!isScrolled ? 'brightness-0 invert' : ''}`} />
+            <img src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656996/uvac-griffon.png" alt="Uvac Griffon Logo" className={`h-14 sm:h-16 w-auto object-contain transition-all duration-300 drop-shadow-md ${!isScrolled ? 'brightness-0 invert' : ''}`} />
           </div>
           
           {/* Desktop Nav */}
@@ -505,17 +505,17 @@ export default function App() {
               {
                 title: t.usp.f1Title,
                 desc: t.usp.f1Desc,
-                image: "https://github.com/user-attachments/assets/5a361a17-3296-4c98-895a-46a1b9aab25b"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656997/beloglavi-sup.jpg"
               },
               {
                 title: t.usp.f2Title,
                 desc: t.usp.f2Desc,
-                image: "https://github.com/user-attachments/assets/a8364b80-6410-4010-a44a-bbda9007bb81"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655311/vidikovac-ravni-krs-uvac.jpg"
               },
               {
                 title: t.usp.f3Title,
                 desc: t.usp.f3Desc,
-                image: "https://github.com/user-attachments/assets/95429ea9-ee11-4240-ad5d-c5a2426be6ac"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/ledena-pecina-uvac.jpg"
               }
             ].map((feature, idx) => (
               <motion.div 
@@ -557,7 +557,7 @@ export default function App() {
               <div className="sm:w-2/5 relative overflow-hidden bg-white h-64 sm:h-auto">
                 <div className="absolute inset-0 p-2 sm:p-4">
                   <video 
-                    src="https://github.com/user-attachments/assets/046d90db-b572-4995-9cd5-380ef57027ca" 
+                    src="https://res.cloudinary.com/dejmpunhb/video/upload/f_auto,q_auto,w_1600/v1777655312/uvac-krstarenje.mp4" 
                     autoPlay 
                     muted 
                     playsInline 
@@ -705,7 +705,7 @@ export default function App() {
               {/* Photo of the road/dock - Placeholder for User's Upload */}
               <div className="rounded-3xl overflow-hidden relative shadow-md aspect-video">
                 <img 
-                  src="https://github.com/user-attachments/assets/07baae8d-ac57-46d5-8da0-6a179ef5bf42" 
+                  src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777655310/uvac-meandri.jpg" 
                   alt="Scenic Route to Uvac" 
                   className="w-full h-full object-cover block"
                   referrerPolicy="no-referrer"
@@ -776,7 +776,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <img src="https://github.com/user-attachments/assets/0f93b148-81a2-43db-9100-6a000177c2f5" alt="Uvac Griffon Logo" className="h-14 sm:h-16 w-auto object-contain brightness-0 invert" />
+              <img src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto,w_1600/v1777656996/uvac-griffon.png" alt="Uvac Griffon Logo" className="h-14 sm:h-16 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="max-w-sm mb-6">
               {t.footer.desc}
