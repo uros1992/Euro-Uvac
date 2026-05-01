@@ -335,7 +335,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img 
-              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777656996/uvac-griffon.png" 
+              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777665116/uvac-griffon.webp" 
               alt="Uvac Griffon - Krstarenje Uvcem" 
               className={`h-14 sm:h-16 w-auto object-contain transition-all duration-300 drop-shadow-md ${!isScrolled ? 'brightness-0 invert' : ''}`}
               fetchPriority="high"
@@ -491,11 +491,11 @@ export default function App() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
             <img 
-              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1400/v1777655310/krstarenje-uvcem-meandri.jpg" 
+              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1400/v1777665113/krstarenje-uvcem-meandri.webp" 
               srcSet="
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_600/v1777655310/krstarenje-uvcem-meandri.jpg 600w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1000/v1777655310/krstarenje-uvcem-meandri.jpg 1000w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1400/v1777655310/krstarenje-uvcem-meandri.jpg 1400w
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_600/v1777665113/krstarenje-uvcem-meandri.webp 600w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1000/v1777665113/krstarenje-uvcem-meandri.webp 1000w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1400/v1777665113/krstarenje-uvcem-meandri.webp 1400w
               "
               sizes="100vw"
               referrerPolicy="no-referrer"
@@ -552,17 +552,17 @@ export default function App() {
               {
                 title: t.usp.f1Title,
                 desc: t.usp.f1Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777656997/beloglavi-sup.jpg"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777665121/beloglavi-sup.webp"
               },
               {
                 title: t.usp.f2Title,
                 desc: t.usp.f2Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777655311/vidikovac-ravni-krs-uvac.jpg"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777665114/vidikovac-ravni-krs-uvac.webp"
               },
               {
                 title: t.usp.f3Title,
                 desc: t.usp.f3Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777655310/ledena-pecina-uvac.jpg"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777665120/ledena-pecina-uvac.webp"
               }
             ].map((feature, idx) => (
               <motion.div 
@@ -754,7 +754,7 @@ export default function App() {
               {/* Photo of the road/dock - Placeholder for User's Upload */}
               <div className="rounded-3xl overflow-hidden relative shadow-md aspect-video">
                 <img 
-                  src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777655310/uvac-meandri.jpg" 
+                  src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777665114/uvac-meandri.webp" 
                   alt="Put do brane Rastoke i polazišta za krstarenje Uvcem" 
                   className="w-full h-full object-cover block"
                   referrerPolicy="no-referrer"
@@ -826,7 +826,7 @@ export default function App() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <img 
-                src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777656996/uvac-griffon.png" 
+                src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777665116/uvac-griffon.webp" 
                 alt="Uvac Griffon" 
                 className="h-14 sm:h-16 w-auto object-contain brightness-0 invert" 
                 loading="lazy"
