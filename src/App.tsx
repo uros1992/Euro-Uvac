@@ -25,8 +25,8 @@ const BookingModal = lazy(() => import('./components/BookingModal'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const ReviewSection = lazy(() => import('./components/ReviewSection'));
 
-// Memoize icons to prevent re-renders
-const FacebookIcon = memo(({ className }: { className?: string }) => (
+// Custom Social Icons (lucide-react doesn't export Facebook/Instagram in this version)
+const Facebook = memo(({ className }: { className?: string }) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
     width="24" 
@@ -39,7 +39,7 @@ const FacebookIcon = memo(({ className }: { className?: string }) => (
   </svg>
 ));
 
-const InstagramIcon = memo(({ className }: { className?: string }) => (
+const Instagram = memo(({ className }: { className?: string }) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
     width="24" 
@@ -66,8 +66,9 @@ const InstagramIcon = memo(({ className }: { className?: string }) => (
   </svg>
 ));
 
-FacebookIcon.displayName = 'FacebookIcon';
-InstagramIcon.displayName = 'InstagramIcon';
+Facebook.displayName = 'Facebook';
+Instagram.displayName = 'Instagram';
+
 
 // Image imports
 // Assets loaded externally via GitHub CDN
@@ -251,10 +252,34 @@ const translations = {
   }
 };
 
+const ReviewSkeleton = () => (
+  <div className="py-20 bg-white">
+    <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+      {[1,2,3].map(i => (
+        <div key={i} className="bg-gray-100 rounded-2xl p-6 animate-pulse">
+          <div className="h-4 bg-gray-200 rounded mb-4 w-3/4"/>
+          <div className="h-4 bg-gray-200 rounded mb-2"/>
+          <div className="h-4 bg-gray-200 rounded w-1/2"/>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [lang, setLang] = useState<'sr' | 'en'>('sr');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('uvac-lang');
+    if (saved === 'sr' || saved === 'en') setLang(saved);
+  }, []);
+
+  const handleLangChange = (newLang: 'sr' | 'en') => {
+    setLang(newLang);
+    localStorage.setItem('uvac-lang', newLang);
+  };
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isAdminRoute, setIsAdminRoute] = useState(window.location.hash === '#admin');
   const [isMobile, setIsMobile] = useState(false);
@@ -355,7 +380,7 @@ export default function App() {
                 className={`transition-colors flex items-center justify-center p-2 rounded-full ${isScrolled ? 'text-gray-500 hover:text-[#1877F2] hover:bg-gray-100' : 'text-white/90 hover:text-[#1877F2] hover:bg-white/10'}`}
                 aria-label="Facebook"
               >
-                <FacebookIcon className="w-5 h-5" />
+                <Facebook className="w-5 h-5" />
               </a>
 
               <a 
@@ -365,18 +390,18 @@ export default function App() {
                 className={`transition-colors flex items-center justify-center p-2 rounded-full ${isScrolled ? 'text-gray-500 hover:text-[#E4405F] hover:bg-gray-100' : 'text-white/90 hover:text-[#E4405F] hover:bg-white/10'}`}
                 aria-label="Instagram"
               >
-                <InstagramIcon className="w-5 h-5" />
+                <Instagram className="w-5 h-5" />
               </a>
 
               <div className={`flex items-center gap-2 rounded-full p-1 ${isScrolled ? 'bg-gray-100' : 'bg-black/20 backdrop-blur-sm'}`}>
                 <button 
-                  onClick={() => setLang('sr')}
+                  onClick={() => handleLangChange('sr')}
                   className={`px-3 py-1 rounded-full text-sm font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
                 >
                   SR
                 </button>
                 <button 
-                  onClick={() => setLang('en')}
+                  onClick={() => handleLangChange('en')}
                   className={`px-3 py-1 rounded-full text-sm font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
                 >
                   EN
@@ -408,13 +433,13 @@ export default function App() {
           <div className="md:hidden flex items-center gap-4">
             <div className={`flex items-center gap-1 rounded-full p-1 ${isScrolled ? 'bg-gray-100' : 'bg-black/20 backdrop-blur-sm'}`}>
               <button 
-                onClick={() => setLang('sr')}
+                onClick={() => handleLangChange('sr')}
                 className={`px-2 py-1 rounded-full text-xs font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
               >
                 SR
               </button>
               <button 
-                onClick={() => setLang('en')}
+                onClick={() => handleLangChange('en')}
                 className={`px-2 py-1 rounded-full text-xs font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
               >
                 EN
@@ -448,7 +473,7 @@ export default function App() {
                 className="text-gray-500 hover:text-[#1877F2] flex items-center justify-center p-2"
                 aria-label="Facebook"
               >
-                <FacebookIcon className="w-6 h-6" />
+                <Facebook className="w-6 h-6" />
               </a>
               <a 
                 href="https://instagram.com/uvacgriffon_krstarenje" 
@@ -457,7 +482,7 @@ export default function App() {
                 className="text-gray-500 hover:text-[#E4405F] flex items-center justify-center p-2"
                 aria-label="Instagram"
               >
-                <InstagramIcon className="w-6 h-6" />
+                <Instagram className="w-6 h-6" />
               </a>
               <button 
                 onClick={() => {
@@ -610,7 +635,8 @@ export default function App() {
                     ref={videoRef}
                     src="https://res.cloudinary.com/dejmpunhb/video/upload/f_auto,q_auto:eco,w_500/v1777655312/uvac-krstarenje.mp4" 
                     muted 
-                    playsInline 
+                    playsInline
+                    autoPlay 
                     preload="none"
                     className="w-full h-full object-contain rounded-[1.5rem] overflow-hidden transition-transform duration-700 group-hover:scale-105"
                   />
@@ -746,7 +772,7 @@ export default function App() {
                   loading="lazy" 
                   referrerPolicy="no-referrer-when-downgrade"
                   className="absolute inset-0"
-                  title="Uvac Griffon Map"
+                  title="Krstarenje Uvac Griffon - Google Maps"
                 ></iframe>
               </div>
               
@@ -773,7 +799,7 @@ export default function App() {
       </section>
 
       {/* Reviews Section */}
-      <Suspense fallback={<div className="py-20 text-center">Učitavanje...</div>}>
+      <Suspense fallback={<ReviewSkeleton />}>
         <ReviewSection 
           t={t.reviews} 
           fallbackReviews={[
@@ -851,7 +877,7 @@ export default function App() {
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-[#1877F2] hover:bg-white/10 transition-colors"
                 aria-label="Facebook"
               >
-                <FacebookIcon className="w-6 h-6" />
+                <Facebook className="w-6 h-6" />
               </a>
               <a 
                 href="https://instagram.com/uvacgriffon_krstarenje" 
@@ -860,7 +886,7 @@ export default function App() {
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-[#E4405F] hover:bg-white/10 transition-colors"
                 aria-label="Instagram"
               >
-                <InstagramIcon className="w-6 h-6" />
+                <Instagram className="w-6 h-6" />
               </a>
             </div>
           </div>
