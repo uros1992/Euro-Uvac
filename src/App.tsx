@@ -337,7 +337,6 @@ export default function App() {
               src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777665116/uvac-griffon.webp" 
               alt="Uvac Griffon - Krstarenje Uvcem" 
               className={`h-14 sm:h-16 w-auto object-contain transition-all duration-300 drop-shadow-md ${!isScrolled ? 'brightness-0 invert' : ''}`}
-              fetchPriority="high"
             />
           </div>
           
@@ -503,7 +502,7 @@ export default function App() {
               className="w-full h-full object-cover"
               fetchPriority="high"
               loading="eager"
-              decoding="sync"
+              decoding="async"
               onError={(e) => {
                 e.currentTarget.src = "https://images.unsplash.com/photo-1610408544955-46743b1740e7?q=80&w=2070&auto=format&fit=crop";
               }}
@@ -512,8 +511,8 @@ export default function App() {
         </div>
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
-          <div className="animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <p className="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
+          <div>
+            <p className="inline-block py-1 px-3 rounded-full bg-black/20 text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
               {t.hero.badge}
             </p>
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
