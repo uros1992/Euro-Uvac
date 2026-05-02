@@ -372,12 +372,16 @@ export default function App() {
               <div className={`flex items-center gap-2 rounded-full p-1 ${isScrolled ? 'bg-gray-100' : 'bg-black/20 backdrop-blur-sm'}`}>
                 <button 
                   onClick={() => setLang('sr')}
+                  aria-label="Srpski jezik"
+                  aria-pressed={lang === 'sr'}
                   className={`px-3 py-1 rounded-full text-sm font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
                 >
                   SR
                 </button>
                 <button 
                   onClick={() => setLang('en')}
+                  aria-label="English language"
+                  aria-pressed={lang === 'en'}
                   className={`px-3 py-1 rounded-full text-sm font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
                 >
                   EN
@@ -398,6 +402,7 @@ export default function App() {
 
               <button 
                 onClick={() => setIsBookingOpen(true)}
+                aria-label="Rezerviši krstarenje"
                 className="bg-uvac-accent hover:bg-[#c49363] text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 {t.nav.book}
@@ -410,12 +415,16 @@ export default function App() {
             <div className={`flex items-center gap-1 rounded-full p-1 ${isScrolled ? 'bg-gray-100' : 'bg-black/20 backdrop-blur-sm'}`}>
               <button 
                 onClick={() => setLang('sr')}
+                aria-label="Srpski jezik"
+                aria-pressed={lang === 'sr'}
                 className={`px-2 py-1 rounded-full text-xs font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
               >
                 SR
               </button>
               <button 
                 onClick={() => setLang('en')}
+                aria-label="English language"
+                aria-pressed={lang === 'en'}
                 className={`px-2 py-1 rounded-full text-xs font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
               >
                 EN
@@ -423,6 +432,8 @@ export default function App() {
             </div>
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Zatvori meni" : "Otvori meni"}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
                 <X className={`w-6 h-6 ${isScrolled ? 'text-gray-900' : 'text-white'}`} />
@@ -519,7 +530,7 @@ export default function App() {
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
               {t.hero.title}
             </h1>
-            <p className="text-lg md:text-2xl text-white/90 mb-10 font-light max-w-2xl mx-auto">
+            <p className="text-lg md:text-2xl text-white mb-10 font-light max-w-2xl mx-auto">
               {t.hero.subtitle}
             </p>
             
@@ -821,7 +832,7 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-uvac-dark text-white/70 py-12 border-t border-white/10">
+      <footer className="bg-uvac-dark text-white/85 py-12 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
@@ -849,7 +860,7 @@ export default function App() {
                 href="https://www.facebook.com/p/Euro-Uvac-Krstarenje-meandrima-Uvca-100071051771543/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-[#1877F2] hover:bg-white/10 transition-colors"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white/85 hover:text-[#1877F2] hover:bg-white/10 transition-colors"
                 aria-label="Facebook"
               >
                 <FacebookIcon className="w-6 h-6" />
@@ -858,7 +869,7 @@ export default function App() {
                 href="https://instagram.com/uvacgriffon_krstarenje" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-[#E4405F] hover:bg-white/10 transition-colors"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white/85 hover:text-[#E4405F] hover:bg-white/10 transition-colors"
                 aria-label="Instagram"
               >
                 <InstagramIcon className="w-6 h-6" />
@@ -866,7 +877,7 @@ export default function App() {
             </div>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-4">{t.footer.linksTitle}</h4>
+            <h3 className="text-white font-bold mb-4">{t.footer.linksTitle}</h3>
             <ul className="space-y-2">
               <li><a href="#about" className="hover:text-white transition-colors">{t.footer.l1}</a></li>
               <li><a href="#tours" className="hover:text-white transition-colors">{t.footer.l2}</a></li>
@@ -875,7 +886,7 @@ export default function App() {
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-4">{t.footer.contactTitle}</h4>
+            <h3 className="text-white font-bold mb-4">{t.footer.contactTitle}</h3>
             <ul className="space-y-3">
               <li><a href="mailto:milivoje.ciro@gmail.com" className="hover:text-white transition-colors">milivoje.ciro@gmail.com</a></li>
               <li className="flex items-center gap-3">
