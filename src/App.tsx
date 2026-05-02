@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
 import { 
   Star, 
   Map,
@@ -531,7 +530,7 @@ export default function App() {
               >
                 {t.hero.checkAvail} <ChevronRight className="w-5 h-5" />
               </button>
-              <a href="#tours" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-full font-bold text-lg transition-all w-full sm:w-auto justify-center text-center">
+              <a href="#tours" className="bg-white/15 hover:bg-white/25 text-white border border-white/30 px-8 py-4 rounded-full font-bold text-lg transition-all w-full sm:w-auto justify-center text-center">
                 {t.hero.viewTours}
               </a>
             </div>
@@ -553,30 +552,30 @@ export default function App() {
               {
                 title: t.usp.f1Title,
                 desc: t.usp.f1Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777665121/beloglavi-sup.webp"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665121/beloglavi-sup.webp",
+                srcSet: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_400/v1777665121/beloglavi-sup.webp 400w, https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665121/beloglavi-sup.webp 700w"
               },
               {
                 title: t.usp.f2Title,
                 desc: t.usp.f2Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777665114/vidikovac-ravni-krs-uvac.webp"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665114/vidikovac-ravni-krs-uvac.webp",
+                srcSet: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_400/v1777665114/vidikovac-ravni-krs-uvac.webp 400w, https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665114/vidikovac-ravni-krs-uvac.webp 700w"
               },
               {
                 title: t.usp.f3Title,
                 desc: t.usp.f3Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777665120/ledena-pecina-uvac.webp"
+                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665120/ledena-pecina-uvac.webp",
+                srcSet: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_400/v1777665120/ledena-pecina-uvac.webp 400w, https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665120/ledena-pecina-uvac.webp 700w"
               }
             ].map((feature, idx) => (
-              <motion.div 
+              <div 
                 key={idx}
-                initial={{ opacity: 0.8, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.1 }}
-                whileHover={{ y: -5 }}
-                className="group relative overflow-hidden rounded-2xl h-96 shadow-lg"
+                className="group relative overflow-hidden rounded-2xl h-96 shadow-lg transform transition-all duration-300 hover:-translate-y-1.5 opacity-100"
               >
                 <img 
                   src={feature.image} 
+                  srcSet={feature.srcSet}
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   alt={idx === 0 ? "Beloglavi sup u letu iznad kanjona Uvca" : idx === 1 ? "Vidikovac Ravni Krš pogled na meandre Uvca" : "Ledeni ukrasi u Ledenoj pećini Uvac"} 
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
@@ -589,7 +588,7 @@ export default function App() {
                   <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
                   <p className="text-white/80 leading-relaxed text-sm">{feature.desc}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -613,7 +612,7 @@ export default function App() {
                     src="https://res.cloudinary.com/dejmpunhb/video/upload/f_auto,q_auto:eco,w_500/v1777655312/uvac-krstarenje.mp4" 
                     muted 
                     playsInline 
-                    preload="auto"
+                    preload="none"
                     className="w-full h-full object-contain rounded-[1.5rem] overflow-hidden transition-transform duration-700 group-hover:scale-105"
                   />
                 </div>
