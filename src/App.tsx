@@ -302,6 +302,20 @@ export default function App() {
   }, []);
 
   const t = translations[lang];
+
+  useEffect(() => {
+    if (lang === 'en') {
+      document.title = 'Uvac River Cruise 2026 | Uvac Griffon – Meanders & Griffon Vultures';
+      document.querySelector('meta[name="description"]')
+        ?.setAttribute('content', 
+        'Boat cruise through Uvac River meanders from Rastoke Dam. Ice Cave, viewpoints and griffon vultures. Season May–October 2026. Book online!');
+    } else {
+      document.title = 'Krstarenje Uvcem 2026 | Uvac Griffon – Meandri i beloglavi supovi';
+      document.querySelector('meta[name="description"]')
+        ?.setAttribute('content', 
+        'Krstarenje meandrima Uvca brodom sa polaskom sa brane Rastoke. Ledena pećina, vidikovci, beloglavi supovi. Sezona 2026: maj–oktobar. Rezerviši odmah!');
+    }
+  }, [lang]);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -543,6 +557,11 @@ export default function App() {
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
               {t.hero.title}
             </h1>
+            <h2 className="text-3xl font-bold text-white mb-3">
+              {lang === 'sr' 
+                ? 'Krstarenje meandrima Uvca brodom' 
+                : 'Boat cruise through Uvac River meanders'}
+            </h2>
             <p className="text-lg md:text-2xl text-white/90 mb-10 font-light max-w-2xl mx-auto">
               {t.hero.subtitle}
             </p>
