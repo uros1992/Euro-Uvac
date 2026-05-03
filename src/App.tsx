@@ -821,10 +821,11 @@ export default function App() {
       <Suspense fallback={<ReviewSkeleton />}>
         <ReviewSection 
           t={t.reviews} 
+          lang={lang}
           fallbackReviews={[
-            { id: '1', name: t.reviews.r1Name, text: t.reviews.r1Text, rating: 5 },
-            { id: '2', name: t.reviews.r2Name, text: t.reviews.r2Text, rating: 5 },
-            { id: '3', name: t.reviews.r3Name, text: t.reviews.r3Text, rating: 5 }
+            { id: '1', name: t.reviews.r1Name, text: t.reviews.r1Text, rating: 5, dateSr: "Jun 2024.", dateEn: "June 2024" },
+            { id: '2', name: t.reviews.r2Name, text: t.reviews.r2Text, rating: 5, dateSr: "Avgust 2025.", dateEn: "August 2025" },
+            { id: '3', name: t.reviews.r3Name, text: t.reviews.r3Text, rating: 5, dateSr: "Septembar 2025.", dateEn: "September 2025" }
           ]} 
         />
       </Suspense>

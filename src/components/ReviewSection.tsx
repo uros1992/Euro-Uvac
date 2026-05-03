@@ -8,9 +8,11 @@ interface Review {
   name: string;
   text: string;
   rating: number;
+  dateSr?: string;
+  dateEn?: string;
 }
 
-export default function ReviewSection({ t, fallbackReviews }: { t: any, fallbackReviews: any[] }) {
+export default function ReviewSection({ t, fallbackReviews, lang }: { t: any, fallbackReviews: any[], lang: string }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,17 +23,31 @@ export default function ReviewSection({ t, fallbackReviews }: { t: any, fallback
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
+  const formatReviewDate = (timestamp: any) => {
+    const date = timestamp ? timestamp.toDate() : new Date();
+    const monthsSR = ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'];
+    const monthsEN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    return {
+      sr: `${monthsSR[date.getMonth()]} ${date.getFullYear()}.`,
+      en: `${monthsEN[date.getMonth()]} ${date.getFullYear()}`
+    };
+  };
+
   useEffect(() => {
     const q = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedReviews: Review[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
+        const formattedDate = formatReviewDate(data.createdAt);
         fetchedReviews.push({
           id: doc.id,
           name: data.name,
           text: data.text,
           rating: data.rating,
+          dateSr: formattedDate.sr,
+          dateEn: formattedDate.en
         });
       });
       setReviews(fetchedReviews);
@@ -93,6 +109,11 @@ export default function ReviewSection({ t, fallbackReviews }: { t: any, fallback
               </div>
               <p className="text-gray-700 mb-6 italic">"{review.text}"</p>
               <div className="font-bold text-uvac-dark">{review.name}</div>
+              {(review.dateSr || review.dateEn) && (
+                <p className="text-sm text-gray-400 mt-0.5">
+                  {lang === 'sr' ? review.dateSr : review.dateEn}
+                </p>
+              )}
             </div>
           ))}
         </div>
