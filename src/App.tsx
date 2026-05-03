@@ -111,12 +111,6 @@ const translations = {
     reviews: {
       title: "Šta kažu naši gosti",
       subtitle: "Pridružite se mnogim zadovoljnim putnicima koji su sa nama otkrili magiju Uvca.",
-      r1Name: "Elena",
-      r1Text: "Nestvarno iskustvo! Vodič je bio fantastičan, a pogled na meandre i beloglave supove ostavlja bez daha. Preporuka svima!",
-      r2Name: "Marko",
-      r2Text: "Odlična organizacija, udoban čamac i prelepa priroda. Ledena pećina je bila poseban doživljaj. Vredi svakog dinara.",
-      r3Name: "Ana",
-      r3Text: "Savršen vikend beg iz grada. Priroda je netaknuta, a domaćini su izuzetno ljubazni. Sigurno ćemo se vratiti.",
       leaveReview: "Ostavi ocenu",
       namePlaceholder: "Tvoje ime",
       reviewPlaceholder: "Podeli svoje iskustvo sa nama...",
@@ -199,12 +193,6 @@ const translations = {
     reviews: {
       title: "What Our Guests Say",
       subtitle: "Join many satisfied travelers who have discovered the magic of Uvac with us.",
-      r1Name: "Elena",
-      r1Text: "Unreal experience! The guide was fantastic, and the view of the meanders and griffon vultures is breathtaking. Highly recommended!",
-      r2Name: "Marko",
-      r2Text: "Great organization, comfortable boat, and beautiful nature. The Ice Cave was a special treat. Worth every penny.",
-      r3Name: "Ana",
-      r3Text: "Perfect weekend getaway from the city. The nature is untouched, and the hosts are extremely kind. We will definitely come back.",
       leaveReview: "Leave a review",
       namePlaceholder: "Your name",
       reviewPlaceholder: "Share your experience with us...",
@@ -822,11 +810,6 @@ export default function App() {
         <ReviewSection 
           t={t.reviews} 
           lang={lang}
-          fallbackReviews={[
-            { id: '1', name: t.reviews.r1Name, text: t.reviews.r1Text, rating: 5, dateSr: "Jun 2024.", dateEn: "June 2024" },
-            { id: '2', name: t.reviews.r2Name, text: t.reviews.r2Text, rating: 5, dateSr: "Avgust 2025.", dateEn: "August 2025" },
-            { id: '3', name: t.reviews.r3Name, text: t.reviews.r3Text, rating: 5, dateSr: "Septembar 2025.", dateEn: "September 2025" }
-          ]} 
         />
       </Suspense>
 

@@ -12,7 +12,7 @@ interface Review {
   dateEn?: string;
 }
 
-export default function ReviewSection({ t, fallbackReviews, lang }: { t: any, fallbackReviews: any[], lang: string }) {
+export default function ReviewSection({ t, lang }: { t: any, lang: string }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,8 +88,6 @@ export default function ReviewSection({ t, fallbackReviews, lang }: { t: any, fa
     }
   };
 
-  const displayReviews = reviews.length > 0 ? reviews : fallbackReviews;
-
   return (
     <section id="reviews" className="py-24 bg-[#fdfaf5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,7 +98,7 @@ export default function ReviewSection({ t, fallbackReviews, lang }: { t: any, fa
 
         {/* Existing / Fetched Reviews */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {displayReviews.slice(0, 9).map((review) => (
+          {reviews.slice(0, 9).map((review) => (
             <div key={review.id} className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
               <div className="flex gap-1 text-yellow-400 mb-4">
                 {[...Array(5)].map((_, i) => (
