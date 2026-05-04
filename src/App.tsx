@@ -436,16 +436,16 @@ export default function App() {
 
           {/* Mobile Menu Toggle */}
           <div className="md:hidden flex items-center gap-4">
-            <div className={`flex items-center gap-1 rounded-full p-1 ${isScrolled ? 'bg-gray-100' : 'bg-black/20 backdrop-blur-sm'}`}>
+            <div className={`flex items-center gap-1 rounded-full p-1.5 ${isScrolled ? 'bg-gray-100' : 'bg-black/20 backdrop-blur-sm'}`}>
               <button 
                 onClick={() => handleLangChange('sr')}
-                className={`px-2 py-1 rounded-full text-xs font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
+                className={`min-w-[32px] min-h-[32px] flex items-center justify-center rounded-full text-xs font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
               >
                 SR
               </button>
               <button 
                 onClick={() => handleLangChange('en')}
-                className={`px-2 py-1 rounded-full text-xs font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
+                className={`min-w-[32px] min-h-[32px] flex items-center justify-center rounded-full text-xs font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
               >
                 EN
               </button>
@@ -464,7 +464,7 @@ export default function App() {
 
         {/* Mobile Nav */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl py-4 flex flex-col items-center gap-4">
+          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl py-4 flex flex-col items-center gap-4 transition-all duration-300 ease-in-out">
             <a href="#about" className="text-gray-800 font-medium" onClick={() => setMobileMenuOpen(false)}>{t.nav.experience}</a>
             <a href="#tours" className="text-gray-800 font-medium" onClick={() => setMobileMenuOpen(false)}>{t.nav.tours}</a>
             <a href="#location" className="text-gray-800 font-medium" onClick={() => setMobileMenuOpen(false)}>{t.nav.location}</a>
@@ -652,7 +652,7 @@ export default function App() {
                   />
                 </div>
               </div>
-              <div className="p-8 sm:w-3/5 flex flex-col justify-between">
+              <div className="p-4 sm:p-8 sm:w-3/5 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-2xl font-serif font-bold text-uvac-dark">{t.tours.t1Title}</h3>

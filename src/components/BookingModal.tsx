@@ -312,7 +312,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-y-auto flex flex-col max-h-[90vh]"
       >
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white z-10">

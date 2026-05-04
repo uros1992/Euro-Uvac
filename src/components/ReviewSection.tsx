@@ -222,6 +222,7 @@ export default function ReviewSection(
                 onChange={(e) => setNewName(e.target.value)}
                 required
                 maxLength={50}
+                style={{ fontSize: '16px' }}
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-uvac-accent text-gray-800"
               />
             </div>
@@ -233,6 +234,7 @@ export default function ReviewSection(
                 required
                 maxLength={1000}
                 rows={4}
+                style={{ fontSize: '16px' }}
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-uvac-accent text-gray-800 resize-none"
               ></textarea>
             </div>
