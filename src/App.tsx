@@ -933,8 +933,6 @@ export default function App() {
           </p>
           <a 
             href="/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
             className="text-gray-400 hover:text-white underline text-sm transition-colors block mb-1"
           >
             {lang === 'sr' ? 'Politika privatnosti' : 'Privacy Policy'}
