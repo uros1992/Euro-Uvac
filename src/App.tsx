@@ -452,6 +452,7 @@ export default function App() {
             </div>
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 -mr-2"
             >
               {mobileMenuOpen ? (
                 <X className={`w-6 h-6 ${isScrolled ? 'text-gray-900' : 'text-white'}`} />
@@ -560,11 +561,11 @@ export default function App() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button 
                 onClick={() => setIsBookingOpen(true)}
-                className="bg-uvac-accent hover:bg-[#c49363] text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-[0_0_20px_rgba(212,163,115,0.4)] hover:shadow-[0_0_30px_rgba(212,163,115,0.6)] transform hover:-translate-y-1 flex items-center gap-2 w-full sm:w-auto justify-center"
+                className="bg-uvac-accent hover:bg-[#c49363] text-white px-6 py-3 rounded-full font-bold text-lg transition-all shadow-[0_0_20px_rgba(212,163,115,0.4)] hover:shadow-[0_0_30px_rgba(212,163,115,0.6)] transform hover:-translate-y-1 flex items-center gap-2 w-auto justify-center"
               >
                 {t.hero.checkAvail} <ChevronRight className="w-5 h-5" />
               </button>
-              <a href="#tours" className="bg-white/15 hover:bg-white/25 text-white border border-white/30 px-8 py-4 rounded-full font-bold text-lg transition-all w-full sm:w-auto justify-center text-center">
+              <a href="#tours" className="bg-white/15 hover:bg-white/25 text-white border border-white/30 px-6 py-3 rounded-full font-bold text-lg transition-all w-auto justify-center text-center">
                 {t.hero.viewTours}
               </a>
             </div>
@@ -866,14 +867,9 @@ export default function App() {
             </div>
             <p className="max-w-sm mb-6">
               {t.footer.desc}
-              <a 
-                href="https://www.uvac.org.rs/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="underline hover:text-white transition-colors"
-              >
+              <span className="underline">
                 {t.footer.reserveLink}
-              </a>.
+              </span>.
             </p>
             <div className="flex gap-4">
               <a 
