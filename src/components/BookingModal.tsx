@@ -124,10 +124,13 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
     return () => unsub();
   }, []);
 
+  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setStep(1);
+      setAgreedToPrivacy(false);
       
       // If current date is out of season (Jan-Apr), default view to May 1st
       const today = new Date();
@@ -571,8 +574,36 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                 )}
 
                 <div className="mt-8 space-y-4">
+                  <label className="flex items-start gap-3 text-sm text-gray-600 cursor-pointer mb-4">
+                    <input 
+                      type="checkbox"
+                      required
+                      checked={agreedToPrivacy}
+                      onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                      className="mt-1 accent-uvac-primary flex-shrink-0"
+                    />
+                    <span>
+                      {lang === 'sr' 
+                        ? 'Saglasan/na sam sa ' 
+                        : 'I agree to the '}
+                      <a 
+                        href="/privacy" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-uvac-primary underline hover:text-uvac-accent"
+                      >
+                        {lang === 'sr' 
+                          ? 'Politikom privatnosti' 
+                          : 'Privacy Policy'}
+                      </a>
+                      {lang === 'sr'
+                        ? '. Moji podaci koriste se isključivo u svrhu potvrde rezervacije.'
+                        : '. My data will be used solely for booking confirmation.'}
+                    </span>
+                  </label>
+
                   <button 
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !agreedToPrivacy}
                     onClick={() => submitBooking()}
                     className="w-full bg-uvac-primary hover:bg-uvac-dark disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2"
                   >

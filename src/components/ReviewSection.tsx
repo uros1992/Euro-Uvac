@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import React, { useState, useEffect, useRef } from 'react';
+import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs, Unsubscribe } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Star } from 'lucide-react';
 
@@ -12,7 +12,23 @@ interface Review {
   dateEn?: string;
 }
 
-export default function ReviewSection({ t, lang }: { t: any, lang: string }) {
+const formatReviewDate = (timestamp: any) => {
+  const date = timestamp ? timestamp.toDate() : new Date();
+  const monthsSR = ['Januar','Februar','Mart','April',
+    'Maj','Jun','Jul','Avgust','Septembar',
+    'Oktobar','Novembar','Decembar'];
+  const monthsEN = ['January','February','March','April',
+    'May','June','July','August','September',
+    'October','November','December'];
+  return {
+    sr: `${monthsSR[date.getMonth()]} ${date.getFullYear()}.`,
+    en: `${monthsEN[date.getMonth()]} ${date.getFullYear()}`
+  };
+};
+
+export default function ReviewSection(
+  { t, lang }: { t: any, lang: string }
+) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,25 +39,25 @@ export default function ReviewSection({ t, lang }: { t: any, lang: string }) {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const formatReviewDate = (timestamp: any) => {
-    const date = timestamp ? timestamp.toDate() : new Date();
-    const monthsSR = ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'];
-    const monthsEN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    
-    return {
-      sr: `${monthsSR[date.getMonth()]} ${date.getFullYear()}.`,
-      en: `${monthsEN[date.getMonth()]} ${date.getFullYear()}`
-    };
-  };
+  const isMounted = useRef(true);
+  const unsubscribeRef = useRef<Unsubscribe | null>(null);
 
-  useEffect(() => {
-    const q = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedReviews: Review[] = [];
-      snapshot.forEach((doc) => {
+  const fetchReviews = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
+
+    const q = query(
+      collection(db, 'reviews'), 
+      orderBy('createdAt', 'desc')
+    );
+
+    try {
+      // 1. Inicijalno učitavanje putem getDocs (brže se prikazuje iz keša/mreže bez čekanja snapshota)
+      const querySnapshot = await getDocs(q);
+      const fetched: Review[] = [];
+      querySnapshot.forEach((doc) => {
         const data = doc.data();
         const formattedDate = formatReviewDate(data.createdAt);
-        fetchedReviews.push({
+        fetched.push({
           id: doc.id,
           name: data.name,
           text: data.text,
@@ -50,19 +66,79 @@ export default function ReviewSection({ t, lang }: { t: any, lang: string }) {
           dateEn: formattedDate.en
         });
       });
-      setReviews(fetchedReviews);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching reviews:", error);
-      setLoading(false);
-    });
 
-    return () => unsubscribe();
+      if (isMounted.current) {
+        setReviews(fetched);
+        setLoading(false);
+      }
+
+      // 2. Pokretanje onSnapshot za realtime ažuriranja
+      // Prvo gasimo prethodni ako postoji
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+
+      unsubscribeRef.current = onSnapshot(q, (snapshot) => {
+        const realtime: Review[] = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const formattedDate = formatReviewDate(data.createdAt);
+          realtime.push({
+            id: doc.id,
+            name: data.name,
+            text: data.text,
+            rating: data.rating,
+            dateSr: formattedDate.sr,
+            dateEn: formattedDate.en
+          });
+        });
+        if (isMounted.current) {
+          setReviews(realtime);
+          setLoading(false);
+        }
+      }, (error) => {
+        console.error("onSnapshot error:", error);
+      });
+
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+      if (isMounted.current) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    isMounted.current = true;
+    fetchReviews(true);
+
+    // BFCACHE FIX: Re-fetch reviews when user comes back from another page via browser navigation
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        fetchReviews();
+      }
+    };
+
+    // REFRESH ON RESUME: Re-fetch when tab becomes active again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchReviews();
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      isMounted.current = false;
+      if (unsubscribeRef.current) unsubscribeRef.current();
+      window.removeEventListener('pageshow', handlePageShow);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim() || !newText.trim() || newRating < 1 || newRating > 5) return;
+    if (!newName.trim() || !newText.trim() || 
+        newRating < 1 || newRating > 5) return;
     
     setIsSubmitting(true);
     setSubmitError('');
@@ -98,22 +174,28 @@ export default function ReviewSection({ t, lang }: { t: any, lang: string }) {
 
         {/* Existing / Fetched Reviews */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {reviews.slice(0, 9).map((review) => (
-            <div key={review.id} className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
-              <div className="flex gap-1 text-yellow-400 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className={`w-5 h-5 ${i < review.rating ? "fill-current" : "text-gray-300"}`} />
-                ))}
-              </div>
-              <p className="text-gray-700 mb-6 italic">"{review.text}"</p>
-              <div className="font-bold text-uvac-dark">{review.name}</div>
-              {(review.dateSr || review.dateEn) && (
-                <p className="text-sm text-gray-400 mt-0.5">
-                  {lang === 'sr' ? review.dateSr : review.dateEn}
-                </p>
-              )}
+          {loading ? (
+            <div className="col-span-full py-20 text-center text-gray-500 italic">
+              {lang === 'sr' ? 'Učitavanje recenzija...' : 'Loading reviews...'}
             </div>
-          ))}
+          ) : (
+            reviews.slice(0, 9).map((review) => (
+              <div key={review.id} className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
+                <div className="flex gap-1 text-yellow-400 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`w-5 h-5 ${i < review.rating ? "fill-current" : "text-gray-300"}`} />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 italic">"{review.text}"</p>
+                <div className="font-bold text-uvac-dark">{review.name}</div>
+                {(review.dateSr || review.dateEn) && (
+                  <p className="text-sm text-gray-400 mt-0.5">
+                    {lang === 'sr' ? review.dateSr : review.dateEn}
+                  </p>
+                )}
+              </div>
+            ))
+          )}
         </div>
 
         {/* Review Form */}

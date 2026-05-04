@@ -269,7 +269,7 @@ export default function App() {
     localStorage.setItem('uvac-lang', newLang);
   };
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [isAdminRoute, setIsAdminRoute] = useState(window.location.hash === '#admin');
+  const [isAdminRoute, setIsAdminRoute] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -282,6 +282,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // Check on mount
+    setIsAdminRoute(window.location.hash === '#admin');
+    
     const handleHashChange = () => {
       setIsAdminRoute(window.location.hash === '#admin');
     };
@@ -925,7 +928,17 @@ export default function App() {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-white/10 text-center text-sm text-gray-400">
-          <p className="mb-2 font-medium text-gray-300">{t.footer.copyright}</p>
+          <p className="mb-1 font-medium text-gray-300">
+            {t.footer.copyright}
+          </p>
+          <a 
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-white underline text-sm transition-colors block mb-1"
+          >
+            {lang === 'sr' ? 'Politika privatnosti' : 'Privacy Policy'}
+          </a>
           <p className="mb-1">{t.footer.organizer}</p>
           <p>{t.footer.legal}</p>
         </div>

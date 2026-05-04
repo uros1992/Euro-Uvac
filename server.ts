@@ -173,6 +173,10 @@ async function startServer() {
     <loc>https://uvacgriffon.rs/#location</loc>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://uvacgriffon.rs/privacy</loc>
+    <priority>0.3</priority>
+  </url>
 </urlset>`);
   });
 
