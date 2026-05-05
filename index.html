@@ -57,42 +57,168 @@
     </noscript>
     <link rel="icon" href="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_100/v1777665118/uvac.webp" />
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+
     {
-      "@context": "https://schema.org",
-      "@graph": [
+      "@type": "WebSite",
+      "@id": "https://uvacgriffon.rs/#website",
+      "name": "Uvac Griffon – Krstarenje Uvcem",
+      "alternateName": ["Krstarenje Euro Uvac", "Uvac boat tours"],
+      "url": "https://uvacgriffon.rs/"
+    },
+
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://uvacgriffon.rs/#business",
+      "name": "Krstarenje Euro Uvac",
+      "alternateName": "Uvac Griffon",
+      "url": "https://uvacgriffon.rs/",
+      "image": "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1200/v1777665113/krstarenje-uvcem-meandri.webp",
+      "description": "Krstarenje meandrima Uvca brodom sa polaskom sa brane Rastoke. Ledena pećina, vidikovci, beloglavi supovi.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Brana Rastoke",
+        "addressLocality": "Nova Varoš",
+        "addressRegion": "Zlatiborski okrug",
+        "postalCode": "31320",
+        "addressCountry": "RS"
+      },
+      "telephone": "+381658862760",
+      "email": "booking@uvacgriffon.rs",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+381658862760",
+        "contactType": "Customer Service",
+        "availableLanguage": [
+          { "@type": "Language", "name": "Serbian", "alternateName": "sr" },
+          { "@type": "Language", "name": "English", "alternateName": "en" }
+        ]
+      },
+
+      "priceRange": "od 2000 RSD",
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 43.41859265482159,
+        "longitude": 19.926836899441174
+      },
+      "hasMap": "https://google.com/maps/place/Krstarenje+Euro+Uvac/@43.4184329,19.926279,17z",
+      "openingHoursSpecification": [
         {
-          "@type": "WebSite",
-          "name": "Krstarenje Uvcem",
-          "alternateName": ["Uvac Griffon", "Krstarenje Uvac Griffon"],
-          "url": "https://uvacgriffon.rs/"
-        },
-        {
-          "@type": "LocalBusiness",
-          "name": "Krstarenje Uvcem",
-          "image": "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1200/v1777665113/krstarenje-uvcem-meandri.webp",
-          "description": "Krstarenje meandrima Uvca brodom sa polaskom sa brane Rastoke. Ledena pećina, vidikovci, beloglavi supovi.",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Brana Rastoke",
-            "addressLocality": "Nova Varoš",
-            "addressRegion": "Zlatiborski okrug",
-            "addressCountry": "RS"
-          },
-          "telephone": "+381658862760",
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": "43.41859265482159",
-            "longitude": "19.926836899441174"
-          }
-        },
-        {
-          "@type": "TouristAttraction",
-          "name": "Specijalni rezervat prirode Uvac",
-          "description": "Vožnja meandrima reke Uvac uz posetu Ledenoj pećini i vidikovcu Molitva."
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "13:00",
+          "closes": "18:00"
         }
-      ]
+      ],
+      "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "bestRating": "5",
+      "worstRating": "1",
+      "reviewCount": "2"
+      },
+    "review": [
+    {
+      "@type": "Review",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "5",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Gost 1"
+      },
+      "reviewBody": "Divan kapetan, odlično iskustvo. Sve preporuke."
+    },
+
+    {
+      "@type": "Review",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "5",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Gost 2"
+      },
+      "reviewBody": "Predivno iskustvo plovidbe Uvcem! Vožnja brodom je bila organizovana, bezbedna i veoma prijatna od samog početka do kraja. Priroda je nestvarna – meandri, litice i pogled koji ostavlja bez daha. Poseban utisak ostavlja trenutak kada ugledate beloglave supove u njihovom prirodnom staništu. Vodič je bio ljubazan i zanimljiv, dao nam je dosta informacija o samom rezervatu i životinjama, što je dodatno obogatilo celo iskustvo. Brod je bio čist i udoban, a atmosfera opuštena. Ovo je definitivno nešto što svako treba da doživi barem jednom – savršena kombinacija avanture, prirode i mira. Sve preporuke!"
     }
-    </script>
+    ],
+
+      "sameAs": [
+        "https://www.instagram.com/uvacgriffon_krstarenje",
+        "https://www.facebook.com/p/Euro-Uvac-Krstarenje-meandrima-Uvca-100071051771543/"
+      ]
+    },
+
+    {
+      "@type": "Service",
+      "@id": "https://uvacgriffon.rs/#tour",
+      "name": "Krstarenje Uvcem",
+      "serviceType": "Boat tour",
+      "description": "Organizovana vožnja brodom meandrima reke Uvac uz obilazak vidikovaca i Ledene pećine.",
+      "provider": {
+        "@id": "https://uvacgriffon.rs/#business"
+      },
+      "areaServed": {
+        "@type": "Place",
+        "name": "Uvac, Serbia"
+      },
+      
+      "offers": {
+        "@type": "Offer",
+        "price": "2000",
+        "priceCurrency": "RSD",
+        "availability": "https://schema.org/InStock",
+        "validFrom": "2026-05-01",
+        "url": "https://uvacgriffon.rs/"
+      }
+    },
+
+        
+
+    {
+      "@type": "TouristAttraction",
+      "@id": "https://uvacgriffon.rs/#attraction",
+      "name": "Specijalni rezervat prirode Uvac",
+      "description": "Vožnja meandrima reke Uvac uz posetu Ledenoj pećini i vidikovcima Ravni Krš i Veliki Vrh.",
+      "touristType": ["Nature lovers", "Photographers", "Adventure travelers"],
+      "mainEntityOfPage": "https://uvacgriffon.rs/",
+      "image": [
+        "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1200/v1777665121/beloglavi-sup.webp",
+        "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1200/v1777665114/vidikovac-ravni-krs-uvac.webp",
+        "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1200/v1777665120/ledena-pecina-uvac.webp",
+        "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_1200/v1777665114/uvac-meandri.webp"
+      ],
+      "isAccessibleForFree": false,
+      "containsPlace": [
+        { "@type": "Place", "name": "Ledena pećina" },
+        { "@type": "Place", "name": "Ravni Krš viewpoint" },
+        { "@type": "Place", "name": "Veliki Vrh viewpoint" }
+      ],
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 43.41859265482159,
+        "longitude": 19.926836899441174
+    }
+    }
+
+  ]
+}
+</script>
   </head>
   <body style="background-color: #0f291e; margin: 0; overflow-x: hidden;">
     <noscript>
