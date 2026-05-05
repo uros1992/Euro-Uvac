@@ -1,37 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs, Unsubscribe } from 'firebase/firestore';
+import React, { useState } from 'react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Star } from 'lucide-react';
-
-interface Review {
-  id: string;
-  name: string;
-  text: string;
-  rating: number;
-  dateSr?: string;
-  dateEn?: string;
-}
-
-const formatReviewDate = (timestamp: any) => {
-  const date = timestamp ? timestamp.toDate() : new Date();
-  const monthsSR = ['Januar','Februar','Mart','April',
-    'Maj','Jun','Jul','Avgust','Septembar',
-    'Oktobar','Novembar','Decembar'];
-  const monthsEN = ['January','February','March','April',
-    'May','June','July','August','September',
-    'October','November','December'];
-  return {
-    sr: `${monthsSR[date.getMonth()]} ${date.getFullYear()}.`,
-    en: `${monthsEN[date.getMonth()]} ${date.getFullYear()}`
-  };
-};
+import { useReviews } from '../context/ReviewsContext';
 
 export default function ReviewSection(
   { t, lang }: { t: any, lang: string }
 ) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-
+  const { reviews, loaded } = useReviews();
+  const loading = !loaded;
   const [newName, setNewName] = useState('');
   const [newText, setNewText] = useState('');
   const [newRating, setNewRating] = useState(5);
@@ -39,111 +16,13 @@ export default function ReviewSection(
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const isMounted = useRef(true);
-  const unsubscribeRef = useRef<Unsubscribe | null>(null);
-
-  const fetchReviews = async (isInitial = false) => {
-    if (isInitial) setLoading(true);
-
-    const q = query(
-      collection(db, 'reviews'), 
-      orderBy('createdAt', 'desc')
-    );
-
-    try {
-      // 1. Inicijalno učitavanje putem getDocs (brže se prikazuje iz keša/mreže bez čekanja snapshota)
-      const querySnapshot = await getDocs(q);
-      const fetched: Review[] = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const formattedDate = formatReviewDate(data.createdAt);
-        fetched.push({
-          id: doc.id,
-          name: data.name,
-          text: data.text,
-          rating: data.rating,
-          dateSr: formattedDate.sr,
-          dateEn: formattedDate.en
-        });
-      });
-
-      if (isMounted.current) {
-        setReviews(fetched);
-        setLoading(false);
-      }
-
-      // 2. Pokretanje onSnapshot za realtime ažuriranja
-      // Prvo gasimo prethodni ako postoji
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-      }
-
-      unsubscribeRef.current = onSnapshot(q, (snapshot) => {
-        const realtime: Review[] = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const formattedDate = formatReviewDate(data.createdAt);
-          realtime.push({
-            id: doc.id,
-            name: data.name,
-            text: data.text,
-            rating: data.rating,
-            dateSr: formattedDate.sr,
-            dateEn: formattedDate.en
-          });
-        });
-        if (isMounted.current) {
-          setReviews(realtime);
-          setLoading(false);
-        }
-      }, (error) => {
-        console.error("onSnapshot error:", error);
-      });
-
-    } catch (err) {
-      console.error("Error fetching reviews:", err);
-      if (isMounted.current) setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    isMounted.current = true;
-    fetchReviews(true);
-
-    // BFCACHE FIX: Re-fetch reviews when user comes back from another page via browser navigation
-    const handlePageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) {
-        fetchReviews();
-      }
-    };
-
-    // REFRESH ON RESUME: Re-fetch when tab becomes active again
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        fetchReviews();
-      }
-    };
-
-    window.addEventListener('pageshow', handlePageShow);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      isMounted.current = false;
-      if (unsubscribeRef.current) unsubscribeRef.current();
-      window.removeEventListener('pageshow', handlePageShow);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim() || !newText.trim() || 
         newRating < 1 || newRating > 5) return;
-    
     setIsSubmitting(true);
     setSubmitError('');
     setSubmitSuccess(false);
-
     try {
       await addDoc(collection(db, 'reviews'), {
         name: newName.trim(),

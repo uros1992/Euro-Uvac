@@ -23,7 +23,7 @@ import { Suspense, lazy, memo } from 'react';
 // Lazy load non-critical components
 const BookingModal = lazy(() => import('./components/BookingModal'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
-const ReviewSection = lazy(() => import('./components/ReviewSection'));
+import ReviewSection from './components/ReviewSection';
 
 // Custom Social Icons (lucide-react doesn't export Facebook/Instagram in this version)
 const Facebook = memo(({ className }: { className?: string }) => (
@@ -810,12 +810,10 @@ export default function App() {
       </section>
 
       {/* Reviews Section */}
-      <Suspense fallback={<ReviewSkeleton />}>
-        <ReviewSection 
-          t={t.reviews} 
-          lang={lang}
-        />
-      </Suspense>
+      <ReviewSection 
+        t={t.reviews} 
+        lang={lang}
+      />
 
       {/* Social Proof / CTA */}
       <section className="py-24 bg-uvac-primary relative overflow-hidden">
