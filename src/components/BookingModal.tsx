@@ -220,12 +220,33 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
     try {
       const reservationId = Date.now().toString() + Math.floor(Math.random() * 1000);
       const finalUserId = currentUser?.uid || `guest_${reservationId}`;
+      const isoDate = new Date(Date.UTC(selectedFullDate.getFullYear(), selectedFullDate.getMonth(), selectedFullDate.getDate())).toISOString();
       
       console.log("Submitting reservation with userId:", finalUserId);
       
+      // NEW: Secure backend call (Expert practice: Keep secrets server-side)
+      const response = await fetch('/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || '',
+          date: isoDate,
+          num: selectedSeats.length,
+          message: `Seats: ${selectedSeats.join(', ')}`
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "API call failed");
+      }
+
+      // Keep Firebase write for real-time calendar sync (if still using it)
       const newReservation = {
         userId: finalUserId,
-        date: new Date(Date.UTC(selectedFullDate.getFullYear(), selectedFullDate.getMonth(), selectedFullDate.getDate())).toISOString(),
+        date: isoDate,
         seats: selectedSeats,
         status: 'confirmed',
         createdAt: new Date().toISOString(),
@@ -242,33 +263,8 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
       
       await batch.commit();
       
-      // Move to success step immediately so user isn't blocked by email sending
       setIsSubmitting(false);
       handleNext();
-      
-      if (formData.email && formData.email.trim() !== '') {
-        // Send email in background
-        fetch('/api/send-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: formData.email.trim(),
-            name: formData.name,
-            date: newReservation.date,
-            seats: selectedSeats.length,
-            lang: lang
-          })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.previewUrl) {
-             setFormData(prev => ({ ...prev, emailPreviewUrl: data.previewUrl }));
-          }
-        })
-        .catch(e => {
-           console.error("Email send failed:", e);
-        });
-      }
     } catch(err: any) {
       console.error("Error creating reservation:", err);
       setError(lang === 'sr' ? "Došlo je do greške prilikom čuvanja rezervacije. Proverite internet vezu i pokušajte ponovo." : "There was an error securing your reservation. Please check your connection and try again.");
