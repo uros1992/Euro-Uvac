@@ -82,13 +82,25 @@ async function startServer() {
       // 2. Pošalji mejlove (ako je čuvanje uspešno)
       const subject = "Nova rezervacija / New Booking - Uvac Griffon";
       
+      const bookingDateObj = new Date(date);
+      const day = bookingDateObj.getUTCDate();
+      const monthsSR = ['Januar','Februar','Mart','April',
+        'Maj','Jun','Jul','Avgust','Septembar',
+        'Oktobar','Novembar','Decembar'];
+      const monthsEN = ['January','February','March','April',
+        'May','June','July','August','September',
+        'October','November','December'];
+      const year = bookingDateObj.getUTCFullYear();
+      const formattedDateSR = `${day}. ${monthsSR[bookingDateObj.getUTCMonth()]} ${year}. u 13:00h`;
+      const formattedDateEN = `${day} ${monthsEN[bookingDateObj.getUTCMonth()]} ${year} at 1:00 PM`;
+
       const adminEmailHtml = `
         <div style="font-family: sans-serif; color: #333;">
           <h2>Nova rezervacija primljena!</h2>
           <p><strong>Ime:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Telefon:</strong> ${phone || 'Nije navedeno'}</p>
-          <p><strong>Datum:</strong> ${date}</p>
+          <p><strong>Datum:</strong> ${formattedDateSR}</p>
           <p><strong>Broj osoba:</strong> ${num}</p>
           <p><strong>Poruka:</strong> ${message || '/'}</p>
           <hr />
@@ -114,7 +126,7 @@ async function startServer() {
       <div style="background-color: #f0f9ff; padding: 15px; 
       border-radius: 8px; margin: 20px 0;">
         <p style="margin: 5px 0;">
-          <strong>📅 Datum:</strong> ${date}
+          <strong>📅 Datum:</strong> ${formattedDateSR}
         </p>
         <p style="margin: 5px 0;">
           <strong>👥 Osoba:</strong> ${num}
@@ -145,7 +157,7 @@ async function startServer() {
       <div style="background-color: #f0f9ff; padding: 15px; 
       border-radius: 8px; margin: 20px 0;">
         <p style="margin: 5px 0;">
-          <strong>📅 Date:</strong> ${date}
+          <strong>📅 Date:</strong> ${formattedDateEN}
         </p>
         <p style="margin: 5px 0;">
           <strong>👥 Guests:</strong> ${num}
@@ -178,7 +190,7 @@ async function startServer() {
       await resend.emails.send({
         from: 'Uvac Griffon <booking@uvacgriffon.rs>',
         to: ['booking@uvacgriffon.rs'],
-        subject: `NOVO: Rezervacija - ${name} (${date})`,
+        subject: `NOVO: Rezervacija - ${name} (${formattedDateSR})`,
         html: adminEmailHtml
       });
 
