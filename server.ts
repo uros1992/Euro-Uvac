@@ -1,7 +1,9 @@
+import "dotenv/config";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { Resend } from "resend";
+import { createClient } from "@supabase/supabase-js";
 
 async function startServer() {
   // Dual-language email support enabled (SR/EN)
@@ -20,6 +22,20 @@ async function startServer() {
     return resendClient;
   };
 
+  // Lazy init Supabase
+  let supabaseClient: ReturnType<typeof createClient> | null = null;
+  const getSupabase = () => {
+    if (!supabaseClient) {
+      const url = process.env.VITE_SUPABASE_URL;
+      const key = process.env.VITE_SUPABASE_ANON_KEY; // OR VITE_SUPABASE_SERVICE_ROLE_KEY if bypassing RLS
+      if (!url || !key) {
+        throw new Error("Supabase credentials missing in environment variables");
+      }
+      supabaseClient = createClient(url, key);
+    }
+    return supabaseClient;
+  };
+
   app.use(express.json());
 
   // Redirect from old Render domain to custom domain
@@ -30,7 +46,101 @@ async function startServer() {
     next();
   });
 
-  // Email route
+  // NEW: Booking endpoint with Supabase storage and Resend notification
+  app.post("/api/booking", async (req, res) => {
+    try {
+      const { name, email, phone, date, message, num } = req.body;
+
+      if (!name || !email || !date || !num) {
+        return res.status(400).json({ success: false, error: "Obavezna polja nisu popunjena." });
+      }
+
+      const supabase = getSupabase();
+      const resend = getResend();
+
+      // 1. Sačuvaj u Supabase
+      const { data: bookingData, error: supabaseError } = await supabase
+        .from('bookings')
+        .insert([
+          { 
+            name, 
+            email, 
+            phone, 
+            booking_date: date, 
+            message, 
+            guests_count: parseInt(num),
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select();
+
+      if (supabaseError) {
+        console.error("Supabase error:", supabaseError);
+        throw new Error("Greška pri čuvanju rezervacije u bazi podataka.");
+      }
+
+      // 2. Pošalji mejlove (ako je čuvanje uspešno)
+      const subject = "Nova rezervacija / New Booking - Uvac Griffon";
+      
+      const adminEmailHtml = `
+        <div style="font-family: sans-serif; color: #333;">
+          <h2>Nova rezervacija primljena!</h2>
+          <p><strong>Ime:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Telefon:</strong> ${phone || 'Nije navedeno'}</p>
+          <p><strong>Datum:</strong> ${date}</p>
+          <p><strong>Broj osoba:</strong> ${num}</p>
+          <p><strong>Poruka:</strong> ${message || '/'}</p>
+          <hr />
+          <p>Proveri Supabase Dashboard za više detalja.</p>
+        </div>
+      `;
+
+      const userEmailHtml = `
+        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
+          <h1 style="color: #0369a1; text-align: center;">Uvac Griffon</h1>
+          <h2 style="text-align: center;">Primili smo Vaš upit! ✅</h2>
+          <p>Zdravo <strong>${name}</strong>,</p>
+          <p>Hvala Vam na interesovanju za krstarenje Uvcem. Primili smo Vašu poruku i obradićemo je u najkraćem mogućem roku.</p>
+          <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${date}</p>
+            <p style="margin: 5px 0;"><strong>👥 Broj osoba:</strong> ${num}</p>
+          </div>
+          <p>Kontaktiraćemo Vas uskoro radi potvrde dostupnosti.</p>
+          <p>Srdačan pozdrav,<br/><strong>Uvac Griffon Tim</strong></p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #888; text-align: center;">Ovo je automatska potvrda prijema upita.</p>
+        </div>
+      `;
+
+      // Šaljemo adminu
+      await resend.emails.send({
+        from: 'Uvac Griffon <booking@uvacgriffon.rs>',
+        to: ['info@uvacgriffon.rs'],
+        subject: `NOVO: Rezervacija - ${name} (${date})`,
+        html: adminEmailHtml
+      });
+
+      // Šaljemo korisniku
+      await resend.emails.send({
+        from: 'Uvac Griffon <booking@uvacgriffon.rs>',
+        to: [email],
+        subject: 'Uspešno ste poslali upit za krstarenje - Uvac Griffon',
+        html: userEmailHtml
+      });
+
+      res.status(200).json({ success: true, message: "Rezervacija uspešno zabeležena i mejlovi poslati." });
+
+    } catch (error: any) {
+      console.error("Booking process error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || "Došlo je do greške prilikom obrade rezervacije." 
+      });
+    }
+  });
+
+  // Email route (legacy / keep for now)
   app.post("/api/send-email", async (req, res) => {
     try {
       const { to, name, date, seats, lang } = req.body;
