@@ -522,8 +522,8 @@ export default function App() {
             <img 
               src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1400/v1777665113/krstarenje-uvcem-meandri.webp" 
               srcSet="
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_400/v1777665113/krstarenje-uvcem-meandri.webp 400w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_600/v1777665113/krstarenje-uvcem-meandri.webp 600w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_400/v1777665113/krstarenje-uvcem-meandri.webp 400w,
+                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_600/v1777665113/krstarenje-uvcem-meandri.webp 600w,
                 https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1000/v1777665113/krstarenje-uvcem-meandri.webp 1000w,
                 https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1400/v1777665113/krstarenje-uvcem-meandri.webp 1400w
               "
