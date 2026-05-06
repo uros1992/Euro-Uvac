@@ -26,10 +26,10 @@ async function startServer() {
   let supabaseClient: ReturnType<typeof createClient> | null = null;
   const getSupabase = () => {
     if (!supabaseClient) {
-      const url = process.env.VITE_SUPABASE_URL;
-      const key = process.env.VITE_SUPABASE_ANON_KEY; // OR VITE_SUPABASE_SERVICE_ROLE_KEY if bypassing RLS
+      const url = process.env.SUPABASE_URL;
+      const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (!url || !key) {
-        throw new Error("Supabase credentials missing in environment variables");
+        throw new Error("Supabase credentials missing: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment variables");
       }
       supabaseClient = createClient(url, key);
     }
@@ -68,7 +68,7 @@ async function startServer() {
             phone, 
             booking_date: date, 
             message, 
-            guests_count: parseInt(num),
+            guest_count: parseInt(num),
             created_at: new Date().toISOString()
           }
         ])
