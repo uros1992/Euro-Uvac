@@ -97,21 +97,82 @@ async function startServer() {
       `;
 
       const userEmailHtml = `
-        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-          <h1 style="color: #0369a1; text-align: center;">Uvac Griffon</h1>
-          <h2 style="text-align: center;">Primili smo Vaš upit! ✅</h2>
-          <p>Zdravo <strong>${name}</strong>,</p>
-          <p>Hvala Vam na interesovanju za krstarenje Uvcem. Primili smo Vašu poruku i obradićemo je u najkraćem mogućem roku.</p>
-          <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${date}</p>
-            <p style="margin: 5px 0;"><strong>👥 Broj osoba:</strong> ${num}</p>
-          </div>
-          <p>Kontaktiraćemo Vas uskoro radi potvrde dostupnosti.</p>
-          <p>Srdačan pozdrav,<br/><strong>Uvac Griffon Tim</strong></p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #888; text-align: center;">Ovo je automatska potvrda prijema upita.</p>
-        </div>
-      `;
+  <div style="font-family: sans-serif; max-width: 600px; 
+  margin: 0 auto; color: #333; line-height: 1.6;">
+    
+    <div style="background-color: #0f291e; padding: 20px; 
+    text-align: center; border-radius: 8px 8px 0 0;">
+      <h1 style="color: white; margin: 0;">Uvac Griffon</h1>
+    </div>
+
+    <div style="padding: 20px; border: 1px solid #e5e7eb; 
+    border-top: none;">
+      <h2 style="color: #0f291e;">Rezervacija potvrđena! ✅</h2>
+      <p>Zdravo <strong>${name}</strong>,</p>
+      <p>Vaša avantura na Uvcu je uspešno rezervisana. 
+      Detalji vaše rezervacije:</p>
+      <div style="background-color: #f0f9ff; padding: 15px; 
+      border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 5px 0;">
+          <strong>📅 Datum:</strong> ${date}
+        </p>
+        <p style="margin: 5px 0;">
+          <strong>👥 Osoba:</strong> ${num}
+        </p>
+        <p style="margin: 5px 0;">
+          <strong>📍 Mesto polaska:</strong> 
+          Brana HE "Uvac", Akmačići
+        </p>
+      </div>
+      <p>Plaćanje se vrši na licu mesta 
+      (2000 RSD po osobi + 420 RSD za ulaz u rezervat 
+      i pećinu).</p>
+      <p>Ako želite da otkažete ili promenite rezervaciju, 
+      molimo vas da nas kontaktirate putem sajta ili 
+      telefona najmanje 24h ranije.</p>
+      <p>Vidimo se na vodi! 🚤</p>
+    </div>
+
+    <div style="margin: 30px 0; 
+    border-top: 2px dashed #e5e7eb;"></div>
+
+    <div style="padding: 20px; border: 1px solid #e5e7eb; 
+    border-radius: 0 0 8px 8px;">
+      <h2 style="color: #0f291e;">Booking Confirmed! ✅</h2>
+      <p>Hello <strong>${name}</strong>,</p>
+      <p>Your Uvac adventure has been successfully booked. 
+      Here are your booking details:</p>
+      <div style="background-color: #f0f9ff; padding: 15px; 
+      border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 5px 0;">
+          <strong>📅 Date:</strong> ${date}
+        </p>
+        <p style="margin: 5px 0;">
+          <strong>👥 Guests:</strong> ${num}
+        </p>
+        <p style="margin: 5px 0;">
+          <strong>📍 Departure:</strong> 
+          Dam HE "Uvac", Akmačići
+        </p>
+      </div>
+      <p>Payment is made on-site 
+      (2000 RSD per person + 420 RSD for reserve 
+      and cave entry).</p>
+      <p>To cancel or modify your booking, please 
+      contact us via the website or phone at least 
+      24 hours in advance.</p>
+      <p>See you out on the water! 🚤</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; 
+      margin: 20px 0;" />
+      <p style="font-size: 12px; color: #6b7280; 
+      text-align: center;">
+        Uvac Griffon | Akmačići, Nova Varoš<br/>
+        <a href="https://uvacgriffon.rs" 
+        style="color: #0f291e;">uvacgriffon.rs</a>
+      </p>
+    </div>
+  </div>
+`;
 
       // Šaljemo adminu
       await resend.emails.send({
