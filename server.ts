@@ -116,7 +116,7 @@ async function startServer() {
       // Šaljemo adminu
       await resend.emails.send({
         from: 'Uvac Griffon <booking@uvacgriffon.rs>',
-        to: ['info@uvacgriffon.rs'],
+        to: ['booking@uvacgriffon.rs'],
         subject: `NOVO: Rezervacija - ${name} (${date})`,
         html: adminEmailHtml
       });
