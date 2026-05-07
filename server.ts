@@ -198,6 +198,9 @@ async function startServer() {
       await resend.emails.send({
         from: 'Uvac Griffon <booking@uvacgriffon.rs>',
         to: [email],
+        bcc: [
+  'theman.uros@gmail.com'
+],
         subject: 'Uspešno ste poslali upit za krstarenje - Uvac Griffon',
         html: userEmailHtml
       });
