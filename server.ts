@@ -201,7 +201,7 @@ async function startServer() {
         bcc: [
   'milivoje.ciro@gmail.com'
 ],
-        subject: 'Uspešno ste poslali upit za krstarenje - Uvac Griffon',
+        subject: 'Rezervacija primljena – Krstarenje Uvcem | Uvac Griffon',
         html: userEmailHtml
       });
 
