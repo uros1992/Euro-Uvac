@@ -199,7 +199,7 @@ async function startServer() {
         from: 'Uvac Griffon <booking@uvacgriffon.rs>',
         to: [email],
         bcc: [
-  'theman.uros@gmail.com'
+  'milivoje.ciro@gmail.com'
 ],
         subject: 'Uspešno ste poslali upit za krstarenje - Uvac Griffon',
         html: userEmailHtml
