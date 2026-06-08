@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import SeoHead from '../../components/SeoHead';
-import { getCloudinarySrcSet } from '../../lib/cloudinary';
+import SeoHead from '../components/SeoHead';
+import { getCloudinarySrcSet } from '../lib/cloudinary';
 import { Link } from 'react-router-dom';
-import { ExperienceHero } from '../../components/experience/ExperienceHero';
-import { ExperienceLead } from '../../components/experience/ExperienceLead';
-import { ContentBlock } from '../../components/experience/ContentBlock';
-import { InfoBox } from '../../components/experience/InfoBox';
-import { RelatedCards } from '../../components/experience/RelatedCards';
-import CTA from '../../components/sections/CTA';
+import { ExperienceHero } from '../components/experience/ExperienceHero';
+import { ExperienceLead } from '../components/experience/ExperienceLead';
+import { ContentBlock } from '../components/experience/ContentBlock';
+import { InfoBox } from '../components/experience/InfoBox';
+import { RelatedCards } from '../components/experience/RelatedCards';
+import CTA from '../components/sections/CTA';
 import { motion } from 'motion/react';
 
 interface LedenaPecinaProps {
@@ -23,13 +23,13 @@ const LedenaPecina = ({ lang, setIsBookingOpen }: LedenaPecinaProps) => {
     "@graph": [
       {
         "@type": ["TouristAttraction", "Cave"],
-        "@id": "https://uvacgriffon.rs/iskustvo/ledena-pecina/#cave",
+        "@id": "https://uvacgriffon.rs/ledena-pecina/#cave",
         "name": lang === 'sr' ? "Ledena pećina" : "Ice Cave",
         "description": lang === 'sr'
           ? "Jedina pećina u Srbiji dostupna isključivo čamcem. Deo Ušačkog pećinskog sistema, duga 2,5 km sa stalnom temperaturom od 8°C."
           : "The only cave in Serbia accessible only by boat. Part of the Ušak cave system, 2.5 km long with a constant temperature of 8°C.",
         "image": "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1200/v1777665120/ledena-pecina-uvac.webp",
-        "url": "https://uvacgriffon.rs/iskustvo/ledena-pecina",
+        "url": "https://uvacgriffon.rs/ledena-pecina",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Nova Varoš",
@@ -63,7 +63,7 @@ const LedenaPecina = ({ lang, setIsBookingOpen }: LedenaPecinaProps) => {
         "containedInPlace": {
           "@type": "Park",
           "name": lang === 'sr' ? "Specijalni rezervat prirode Uvac" : "Uvac Special Nature Reserve",
-          "url": "https://uvacgriffon.rs/iskustvo/kanjon-uvca"
+          "url": "https://uvacgriffon.rs/kanjon-uvca"
         },
         "offers": {
           "@type": "Offer",
@@ -80,7 +80,7 @@ const LedenaPecina = ({ lang, setIsBookingOpen }: LedenaPecinaProps) => {
       <SeoHead 
         title={lang === 'sr' ? 'Ledena pećina – Krstarenje Uvcem | Uvac Griffon' : 'Ice Cave – Uvac Cruise | Uvac Griffon'}
         description={lang === 'sr' ? 'Istražite Ledenu pećinu, skriveni dragulj kanjona Uvca sa stalnom temperaturom od 8°C i fascinantnim pećinskim nakitom.' : 'Explore the Ice Cave, a hidden gem of the Uvac Canyon with a constant temperature of 8°C and fascinating cave jewelry.'}
-        canonicalUrl="https://uvacgriffon.rs/iskustvo/ledena-pecina"
+        canonicalUrl="https://uvacgriffon.rs/ledena-pecina"
         ogImage="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1200/v1777665120/ledena-pecina-uvac.webp"
         schema={schema}
       />
@@ -111,7 +111,7 @@ const LedenaPecina = ({ lang, setIsBookingOpen }: LedenaPecinaProps) => {
               krstarenja Uvcem
             </Link>
             , na smaragdnoj vodi, gde se meandri sužavaju, a litice postaju sve strmije. Skriveni ulaz u pećinu otvara se visoko u krševitoj steni, na mestu gde se reka oštro lomi. Dok se čamcem približavate obali u srcu{' '}
-            <Link to="/iskustvo/kanjon-uvca" className="text-uvac-accent hover:underline font-medium">
+            <Link to="/kanjon-uvca" className="text-uvac-accent hover:underline font-medium">
               kanjona Uvca
             </Link>
             , direktno preko puta vas naziru se sivi kameni ostaci Jerininog grada — tvrđave koja vekovima čuva ovaj ulaz. Taj susret istorije na liticama i nepoznatog u podzemlju stvoriće u vama osećaj istinske avanture i pre nego što zakoračite u prvu dvoranu.
@@ -123,7 +123,7 @@ const LedenaPecina = ({ lang, setIsBookingOpen }: LedenaPecinaProps) => {
               Uvac cruise
             </Link>
             , on emerald water where the meanders narrow and the cliffs grow steeper. A hidden entrance to the cave opens high in the craggy rock, at the point where the river makes a sharp turn. As you approach the shore in the heart of the{' '}
-            <Link to="/iskustvo/kanjon-uvca" className="text-uvac-accent hover:underline font-medium">
+            <Link to="/kanjon-uvca" className="text-uvac-accent hover:underline font-medium">
               Uvac Canyon
             </Link>
             , directly across from you, the gray stone remains of Jerinin grad come into view — a fortress that has guarded this entrance for centuries. This meeting of history on the cliffs and the unknown underground will create a sense of true adventure within you even before you step into the first chamber.
@@ -165,7 +165,7 @@ const LedenaPecina = ({ lang, setIsBookingOpen }: LedenaPecinaProps) => {
             {lang === 'sr' ? (
               <>
                 Ono što su{' '}
-                <Link to="/iskustvo/beloglavi-sup" className="text-uvac-accent hover:underline font-medium">
+                <Link to="/beloglavi-sup" className="text-uvac-accent hover:underline font-medium">
                   beloglavi supovi
                 </Link>{' '}
                 za nebo iznad kanjona, to su njeni skriveni stanovnici za tišinu Ledene pećine — njeni najvažniji i najverniji čuvari. Dok supovi gospodare liticama, u dubini mraka život pulsira na potpuno drugačiji, skriveni način. Pećina nije samo prirodni muzej, već strogo zaštićeno utočište za kolonije slepih miševa i retku pećinsku stonogu, endemsku vrstu koja nastanjuje samo ove prostore. Njihovo prisustvo nam govori da je ovaj podzemni svet ostao čist, netaknut i jednako važan za prirodu kao i same litice iznad njega.
@@ -173,7 +173,7 @@ const LedenaPecina = ({ lang, setIsBookingOpen }: LedenaPecinaProps) => {
             ) : (
               <>
                 What the{' '}
-                <Link to="/iskustvo/beloglavi-sup" className="text-uvac-accent hover:underline font-medium">
+                <Link to="/beloglavi-sup" className="text-uvac-accent hover:underline font-medium">
                   Griffon Vultures
                 </Link>{' '}
                 are to the skies above the canyon, its hidden inhabitants are to the silence of the Ice Cave — its most vital and loyal guardians. While the vultures rule the cliffs, life pulses in a completely different, hidden way within the depths of the darkness. The cave is not merely a natural museum, but a strictly protected sanctuary for colonies of bats and a rare cave centipede, an endemic species that inhabits only this space. Their presence tells us that this underground world has remained pure, untouched, and just as important to nature as the very cliffs above it.

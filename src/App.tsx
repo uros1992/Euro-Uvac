@@ -12,9 +12,9 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const ExperiencePage = lazy(() => import('./pages/ExperiencePage'));
 
 // Specific Experience Spoke Pages
-const BeloglaviSup = lazy(() => import('./pages/experience/BeloglaviSup'));
-const KanjonUvca = lazy(() => import('./pages/experience/KanjonUvca'));
-const LedenaPecina = lazy(() => import('./pages/experience/LedenaPecina'));
+const BeloglaviSup = lazy(() => import('./pages/BeloglaviSup'));
+const KanjonUvca = lazy(() => import('./pages/KanjonUvca'));
+const LedenaPecina = lazy(() => import('./pages/LedenaPecina'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const ImageCreditsPage = lazy(() => import('./pages/ImageCreditsPage'));
 
@@ -86,9 +86,9 @@ export default function App() {
             <Route path="/iskustvo" element={<ExperiencePage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
             
             {/* Experience Spoke Pages */}
-            <Route path="/iskustvo/beloglavi-sup" element={<BeloglaviSup lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
-            <Route path="/iskustvo/kanjon-uvca" element={<KanjonUvca lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
-            <Route path="/iskustvo/ledena-pecina" element={<LedenaPecina lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/beloglavi-sup" element={<BeloglaviSup lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/kanjon-uvca" element={<KanjonUvca lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/ledena-pecina" element={<LedenaPecina lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
             
             <Route path="/tura" element={<TourPage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
             <Route path="/recenzije" element={<ReviewsPage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />

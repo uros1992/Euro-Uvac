@@ -43,7 +43,7 @@ export const RelatedCards: React.FC<RelatedCardsProps> = ({ exclude, lang }) => 
             return (
               <Link 
                 key={item.slug} 
-                to={`/iskustvo/${item.slug}`}
+                to={`/${item.slug}`}
                 className="group relative h-[400px] overflow-hidden rounded-xl shadow-lg"
               >
                 <img 

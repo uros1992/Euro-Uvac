@@ -42,19 +42,19 @@ export default function ExperiencePage({ lang, setIsBookingOpen }: ExperiencePag
               "@type": "ListItem",
               "position": 1,
               "name": lang === 'en' ? "Uvac Canyon & Meanders" : "Kanjon Uvca i Meandri",
-              "url": "https://uvacgriffon.rs/iskustvo/kanjon-uvca"
+              "url": "https://uvacgriffon.rs/kanjon-uvca"
             },
             {
               "@type": "ListItem",
               "position": 2,
               "name": lang === 'en' ? "Ice Cave" : "Ledena pećina",
-              "url": "https://uvacgriffon.rs/iskustvo/ledena-pecina"
+              "url": "https://uvacgriffon.rs/ledena-pecina"
             },
             {
               "@type": "ListItem",
               "position": 3,
               "name": lang === 'en' ? "Griffon Vulture" : "Beloglavi sup",
-              "url": "https://uvacgriffon.rs/iskustvo/beloglavi-sup"
+              "url": "https://uvacgriffon.rs/beloglavi-sup"
             }
           ]
         }

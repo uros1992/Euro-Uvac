@@ -46,7 +46,7 @@ export default function Experience({ lang }: ExperienceProps) {
           {experienceData.map((feature, idx) => (
             <Link 
               key={idx}
-              to={`/iskustvo/${feature.slug}`}
+              to={`/${feature.slug}`}
               className="group relative overflow-hidden rounded-xl h-96 shadow-lg transform transition-all duration-300 hover:-translate-y-1.5 opacity-100 block"
             >
               <img 

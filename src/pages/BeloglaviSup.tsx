@@ -1,13 +1,13 @@
 import React from 'react';
-import SeoHead from '../../components/SeoHead';
-import { getCloudinarySrcSet } from '../../lib/cloudinary';
+import SeoHead from '../components/SeoHead';
+import { getCloudinarySrcSet } from '../lib/cloudinary';
 import { Link } from 'react-router-dom';
-import { ExperienceHero } from '../../components/experience/ExperienceHero';
-import { ExperienceLead } from '../../components/experience/ExperienceLead';
-import { ContentBlock } from '../../components/experience/ContentBlock';
-import { InfoBox } from '../../components/experience/InfoBox';
-import { RelatedCards } from '../../components/experience/RelatedCards';
-import CTA from '../../components/sections/CTA';
+import { ExperienceHero } from '../components/experience/ExperienceHero';
+import { ExperienceLead } from '../components/experience/ExperienceLead';
+import { ContentBlock } from '../components/experience/ContentBlock';
+import { InfoBox } from '../components/experience/InfoBox';
+import { RelatedCards } from '../components/experience/RelatedCards';
+import CTA from '../components/sections/CTA';
 import { motion } from 'motion/react';
 
 interface BeloglaviSupProps {
@@ -21,13 +21,13 @@ const BeloglaviSup = ({ lang, setIsBookingOpen }: BeloglaviSupProps) => {
     "@graph": [
       {
         "@type": "TouristAttraction",
-        "@id": "https://uvacgriffon.rs/iskustvo/beloglavi-sup/#attraction",
+        "@id": "https://uvacgriffon.rs/beloglavi-sup/#attraction",
         "name": lang === 'sr' ? "Beloglavi sup – Specijalni rezervat prirode Uvac" : "Griffon Vulture – Uvac Special Nature Reserve",
         "description": lang === 'sr'
           ? "Dom jedne od najvećih kolonija beloglavih supova na Balkanu. Posmatranje iz čamca tokom krstarenja Uvcem."
           : "Home to one of the largest colonies of griffon vultures in the Balkans. Observation from the boat during the Uvac cruise.",
         "image": "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1200/v1778782184/Beloglavi-sup-u-letu.webp",
-        "url": "https://uvacgriffon.rs/iskustvo/beloglavi-sup",
+        "url": "https://uvacgriffon.rs/beloglavi-sup",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Nova Varoš",
@@ -43,7 +43,7 @@ const BeloglaviSup = ({ lang, setIsBookingOpen }: BeloglaviSupProps) => {
         "containedInPlace": {
           "@type": "Park",
           "name": "Specijalni rezervat prirode Uvac",
-          "url": "https://uvacgriffon.rs/iskustvo/kanjon-uvca"
+          "url": "https://uvacgriffon.rs/kanjon-uvca"
         },
             "publicAccess": true
       },
@@ -76,7 +76,7 @@ const BeloglaviSup = ({ lang, setIsBookingOpen }: BeloglaviSupProps) => {
             "@type": "ListItem",
             "position": 3,
             "name": lang === 'sr' ? "Beloglavi sup" : "Griffon Vulture",
-            "item": "https://uvacgriffon.rs/iskustvo/beloglavi-sup"
+            "item": "https://uvacgriffon.rs/beloglavi-sup"
           }
         ]
       }
@@ -88,7 +88,7 @@ const BeloglaviSup = ({ lang, setIsBookingOpen }: BeloglaviSupProps) => {
       <SeoHead 
         title={lang === 'sr' ? 'Beloglavi sup – Nebeski kralj Uvca | Uvac Griffon' : 'Griffon Vulture – Sky King of Uvac | Uvac Griffon'}
         description={lang === 'sr' ? 'Upoznajte beloglavog supa, zaštitni znak kanjona Uvca. Saznajte sve o nebeskom kralju našeg kanjona i zašto je krstarenje Uvcem jedno od najboljih mesta za njegovo posmatranje.' : 'Discover the Griffon Vulture, the defining symbol of the Uvac Canyon. Learn all about the sky king of our canyon and why a Uvac cruise is one of the best ways to observe it.'}
-        canonicalUrl="https://uvacgriffon.rs/iskustvo/beloglavi-sup"
+        canonicalUrl="https://uvacgriffon.rs/beloglavi-sup"
         ogImage="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1200/v1778782184/Beloglavi-sup-u-letu.webp"
         schema={schema}
       />
@@ -199,7 +199,7 @@ const BeloglaviSup = ({ lang, setIsBookingOpen }: BeloglaviSupProps) => {
         text={lang === 'sr' ? (
           <p>
             Miroljubiva priroda beloglavog supa ima dublju svrhu — on predstavlja ključnu kariku u održavanju zdravlja čitavog kanjona. Kao prirodni higijeničar, hrani se isključivo uginulim životinjama, čime sprečava širenje zaraza i održava ekosistem čistim. Ipak, ova dragocena uloga umalo je postala deo istorije. Devedesetih godina prošlog veka, kolonija na Uvcu bila je svedena na svega desetak preostalih parova, ostavljajući vrstu na samoj ivici nestanka. Zahvaljujući dugogodišnjim programima zaštite i organizovanom hranilištu, populacija je uspešno obnovljena. Danas je{' '}
-            <Link to="/iskustvo/kanjon-uvca" className="text-uvac-accent hover:underline font-medium">
+            <Link to="/kanjon-uvca" className="text-uvac-accent hover:underline font-medium">
               kanjon Uvca
             </Link>{' '}
             jedno od retkih mesta u Evropi gde posetioci mogu redovno da posmatraju velike kolonije beloglavih supova u njihovom prirodnom staništu.
@@ -207,7 +207,7 @@ const BeloglaviSup = ({ lang, setIsBookingOpen }: BeloglaviSupProps) => {
         ) : (
           <p>
             The peaceful nature of the Griffon Vulture serves a deeper purpose — it represents a key link in maintaining the health of the entire canyon. As nature's hygienist, it feeds exclusively on carrion, preventing the spread of disease and keeping the ecosystem clean. Yet, this vital role nearly became a thing of the past. In the 1990s, the Uvac colony was reduced to just ten remaining pairs, leaving the species on the very brink of extinction. Thanks to long-standing conservation programs and an organized feeding station, the population has been successfully restored. Today, the{' '}
-            <Link to="/iskustvo/kanjon-uvca" className="text-uvac-accent hover:underline font-medium">
+            <Link to="/kanjon-uvca" className="text-uvac-accent hover:underline font-medium">
               Uvac canyon
             </Link>{' '}
             is one of the rare places in Europe where visitors can regularly observe large colonies of Griffon Vultures in their natural habitat.

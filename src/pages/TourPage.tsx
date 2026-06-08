@@ -124,11 +124,11 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
     }
 
     const linksMap: LinkItem[] = lang === 'sr' ? [
-      { phrase: 'Ledenu pećinu', path: '/iskustvo/ledena-pecina' },
-      { phrase: 'beloglavi supovi', path: '/iskustvo/beloglavi-sup' },
+      { phrase: 'Ledenu pećinu', path: '/ledena-pecina' },
+      { phrase: 'beloglavi supovi', path: '/beloglavi-sup' },
       {
         phrase: 'kanjon ',
-        path: '/iskustvo/kanjon-uvca',
+        path: '/kanjon-uvca',
         customRender: (path, phrase, index) => (
           <span key={`${path}-${index}`}>
             <Link to={path} className="text-uvac-accent hover:underline font-medium">
@@ -139,7 +139,7 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
       },
       {
         phrase: 'podnožja vidikovca',
-        path: '/iskustvo/kanjon-uvca#vidikovci',
+        path: '/kanjon-uvca#vidikovci',
         customRender: (path, phrase, index) => (
           <span key={`${path}-${index}`}>
             podnožja{' '}
@@ -150,11 +150,11 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
         )
       }
     ] : [
-      { phrase: 'Ice Cave', path: '/iskustvo/ledena-pecina' },
-      { phrase: 'Griffon Vultures', path: '/iskustvo/beloglavi-sup' },
+      { phrase: 'Ice Cave', path: '/ledena-pecina' },
+      { phrase: 'Griffon Vultures', path: '/beloglavi-sup' },
       {
         phrase: 'canyon ',
-        path: '/iskustvo/kanjon-uvca',
+        path: '/kanjon-uvca',
         customRender: (path, phrase, index) => (
           <span key={`${path}-${index}`}>
             <Link to={path} className="text-uvac-accent hover:underline font-medium">
@@ -165,7 +165,7 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
       },
       {
         phrase: 'base of the viewpoint',
-        path: '/iskustvo/kanjon-uvca#vidikovci',
+        path: '/kanjon-uvca#vidikovci',
         customRender: (path, phrase, index) => (
           <span key={`${path}-${index}`}>
             base of the{' '}
@@ -271,7 +271,7 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
               "position": 2,
               "name": lang === 'en' ? "Ice Cave Exploration (2:00 p.m.)" : "Obilazak Ledene pećine (14:00)",
               "item": {
-                "@id": "https://uvacgriffon.rs/iskustvo/ledena-pecina/#cave"
+                "@id": "https://uvacgriffon.rs/ledena-pecina/#cave"
               }
             },
             {
@@ -279,7 +279,7 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
               "position": 3,
               "name": lang === 'en' ? "Hike to Veliki Vrh Viewpoint (2:30 p.m.)" : "Uspon na vidikovac Veliki Vrh (14:30)",
               "item": {
-                "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#veliki-vrh"
+                "@id": "https://uvacgriffon.rs/kanjon-uvca/#veliki-vrh"
               }
             },
             {
@@ -287,7 +287,7 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
               "position": 4,
               "name": lang === 'en' ? "Observing Griffon Vultures & View of Ravni Krš (3:30 p.m.)" : "Posmatranje beloglavih supova i vidikovac Ravni Krš (15:30)",
               "item": {
-                "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#ravni-krs"
+                "@id": "https://uvacgriffon.rs/kanjon-uvca/#ravni-krs"
               }
             },
             {
@@ -302,10 +302,10 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
         },
         "hasPart": [
           { "@id": "https://uvacgriffon.rs/tura/#start" },
-          { "@id": "https://uvacgriffon.rs/iskustvo/ledena-pecina/#cave" },
-          { "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#veliki-vrh" },
-          { "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#ravni-krs" },
-          { "@id": "https://uvacgriffon.rs/iskustvo/beloglavi-sup/#attraction" }
+          { "@id": "https://uvacgriffon.rs/ledena-pecina/#cave" },
+          { "@id": "https://uvacgriffon.rs/kanjon-uvca/#veliki-vrh" },
+          { "@id": "https://uvacgriffon.rs/kanjon-uvca/#ravni-krs" },
+          { "@id": "https://uvacgriffon.rs/beloglavi-sup/#attraction" }
         ]
       },
       {
@@ -329,12 +329,12 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
         "@type": "Park",
         "@id": "https://uvacgriffon.rs/#reserve",
         "name": lang === 'sr' ? "Specijalni rezervat prirode Uvac" : "Uvac Special Nature Reserve",
-        "url": "https://uvacgriffon.rs/iskustvo/kanjon-uvca",
+        "url": "https://uvacgriffon.rs/kanjon-uvca",
         "containsPlace": [
-          { "@id": "https://uvacgriffon.rs/iskustvo/ledena-pecina/#cave" },
-          { "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#veliki-vrh" },
-          { "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#ravni-krs" },
-          { "@id": "https://uvacgriffon.rs/iskustvo/beloglavi-sup/#attraction" }
+          { "@id": "https://uvacgriffon.rs/ledena-pecina/#cave" },
+          { "@id": "https://uvacgriffon.rs/kanjon-uvca/#veliki-vrh" },
+          { "@id": "https://uvacgriffon.rs/kanjon-uvca/#ravni-krs" },
+          { "@id": "https://uvacgriffon.rs/beloglavi-sup/#attraction" }
         ]
       },
       {
@@ -352,12 +352,12 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
       },
       {
         "@type": ["Cave", "TouristAttraction"],
-        "@id": "https://uvacgriffon.rs/iskustvo/ledena-pecina/#cave",
+        "@id": "https://uvacgriffon.rs/ledena-pecina/#cave",
         "name": lang === 'sr' ? "Ledena pećina" : "Ice Cave",
         "description": lang === 'sr'
           ? "Skriveni dragulj Uvca do kojeg se stiže isključivo čamcem. Obilazak obuhvata oko 700 metara unutrašnjih kanala i dvorana."
           : "A hidden gem of Uvac accessible only by boat, with around 700 meters of passages open to visitors.",
-        "url": "https://uvacgriffon.rs/iskustvo/ledena-pecina",
+        "url": "https://uvacgriffon.rs/ledena-pecina",
         "geo": {
           "@type": "GeoCoordinates",
           "latitude": 43.357011,
@@ -366,12 +366,12 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
       },
       {
         "@type": "TouristAttraction",
-        "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#veliki-vrh",
+        "@id": "https://uvacgriffon.rs/kanjon-uvca/#veliki-vrh",
         "name": lang === 'sr' ? "Vidikovac Veliki Vrh" : "Veliki Vrh Viewpoint",
         "description": lang === 'sr'
           ? "Jedan od najpoznatijih vidikovaca sa koga se pruža nestvaran pogled na meandre i gnezda beloglavog supa."
           : "One of the most famous viewpoints offering an unreal view of the meanders and griffon vulture nests.",
-        "url": "https://uvacgriffon.rs/iskustvo/kanjon-uvca",
+        "url": "https://uvacgriffon.rs/kanjon-uvca",
         "geo": {
           "@type": "GeoCoordinates",
           "latitude": 43.357444,
@@ -380,12 +380,12 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
       },
       {
         "@type": "TouristAttraction",
-        "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#ravni-krs",
+        "@id": "https://uvacgriffon.rs/kanjon-uvca/#ravni-krs",
         "name": lang === 'sr' ? "Vidikovac Ravni Krš" : "Ravni Krš Viewpoint",
         "description": lang === 'sr'
           ? "Fascinantan pogled na kanjon. Mesto gde priroda ostavlja bez daha."
           : "A fascinating view of the canyon. A place where nature takes your breath away.",
-        "url": "https://uvacgriffon.rs/iskustvo/kanjon-uvca",
+        "url": "https://uvacgriffon.rs/kanjon-uvca",
         "geo": {
           "@type": "GeoCoordinates",
           "latitude": 43.352879,
@@ -394,12 +394,12 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
       },
       {
         "@type": "TouristAttraction",
-        "@id": "https://uvacgriffon.rs/iskustvo/beloglavi-sup/#attraction",
+        "@id": "https://uvacgriffon.rs/beloglavi-sup/#attraction",
         "name": lang === 'sr' ? "Kolonija beloglavih supova" : "Griffon Vulture Colony",
         "description": lang === 'sr'
           ? "Tokom krstarenja imaćete priliku da posmatrate beloglave supove u njihovom prirodnom staništu. Kanjon Uvca dom je jedne od najvećih kolonija ove impresivne ptice na Balkanu."
           : "During the cruise, you may observe griffon vultures in their natural habitat. The Uvac Canyon is home to one of the largest colonies of this impressive bird in the Balkans.",
-        "url": "https://uvacgriffon.rs/iskustvo/beloglavi-sup",
+        "url": "https://uvacgriffon.rs/beloglavi-sup",
         "geo": {
           "@type": "GeoCoordinates",
           "latitude": 43.361824,

@@ -30,9 +30,9 @@ export default function Navbar({ isScrolled, lang, setLang, setIsBookingOpen }: 
   const heroRoutes = [
     '/', 
     '/iskustvo', 
-    '/iskustvo/beloglavi-sup', 
-    '/iskustvo/kanjon-uvca', 
-    '/iskustvo/ledena-pecina',
+    '/beloglavi-sup', 
+    '/kanjon-uvca', 
+    '/ledena-pecina',
     '/tura'
   ];
   const isHeroPage = heroRoutes.includes(normalizedPath);
@@ -43,9 +43,9 @@ export default function Navbar({ isScrolled, lang, setLang, setIsBookingOpen }: 
   };
 
   const experienceLinks = [
-    { name: t.usp.f1Title, path: '/iskustvo/beloglavi-sup' },
-    { name: t.usp.f2Title, path: '/iskustvo/kanjon-uvca' },
-    { name: t.usp.f3Title, path: '/iskustvo/ledena-pecina' },
+    { name: t.usp.f1Title, path: '/beloglavi-sup' },
+    { name: t.usp.f2Title, path: '/kanjon-uvca' },
+    { name: t.usp.f3Title, path: '/ledena-pecina' },
   ];
 
   const navLinks = [

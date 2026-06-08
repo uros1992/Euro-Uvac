@@ -1,14 +1,14 @@
 import React from 'react';
-import SeoHead from '../../components/SeoHead';
-import { getCloudinarySrcSet } from '../../lib/cloudinary';
+import SeoHead from '../components/SeoHead';
+import { getCloudinarySrcSet } from '../lib/cloudinary';
 import { Link } from 'react-router-dom';
-import { ExperienceHero } from '../../components/experience/ExperienceHero';
-import { ExperienceLead } from '../../components/experience/ExperienceLead';
-import { ContentBlock } from '../../components/experience/ContentBlock';
-import { Gallery } from '../../components/experience/Gallery';
-import { InfoBox } from '../../components/experience/InfoBox';
-import { RelatedCards } from '../../components/experience/RelatedCards';
-import CTA from '../../components/sections/CTA';
+import { ExperienceHero } from '../components/experience/ExperienceHero';
+import { ExperienceLead } from '../components/experience/ExperienceLead';
+import { ContentBlock } from '../components/experience/ContentBlock';
+import { Gallery } from '../components/experience/Gallery';
+import { InfoBox } from '../components/experience/InfoBox';
+import { RelatedCards } from '../components/experience/RelatedCards';
+import CTA from '../components/sections/CTA';
 import { motion } from 'motion/react';
 
 interface KanjonUvcaProps {
@@ -22,13 +22,13 @@ const KanjonUvca = ({ lang, setIsBookingOpen }: KanjonUvcaProps) => {
     "@graph": [
       {
         "@type": "TouristAttraction",
-        "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#attraction",
+        "@id": "https://uvacgriffon.rs/kanjon-uvca/#attraction",
         "name": lang === 'sr' ? "Kanjon Uvca" : "Uvac Canyon",
         "description": lang === 'sr'
           ? "Specijalni rezervat prirode sa spektakularnim meandrima reke Uvac, vidikovcima Ravni Krš i Veliki Vrh i kolonijom beloglavih supova."
           : "Special nature reserve with spectacular meanders of the Uvac river, viewpoints Ravni Krš and Veliki Vrh and a colony of griffon vultures.",
         "image": "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1200/v1777665114/vidikovac-ravni-krs-uvac.webp",
-        "url": "https://uvacgriffon.rs/iskustvo/kanjon-uvca",
+        "url": "https://uvacgriffon.rs/kanjon-uvca",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Nova Varoš",
@@ -55,14 +55,14 @@ const KanjonUvca = ({ lang, setIsBookingOpen }: KanjonUvcaProps) => {
       },
       {
         "@type": "TouristAttraction",
-        "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#viewpoints",
+        "@id": "https://uvacgriffon.rs/kanjon-uvca/#viewpoints",
         "name": lang === 'sr' ? "Vidikovci Veliki Vrh i Ravni Krš" : "Scenic Viewpoints Veliki Vrh & Ravni Krš",
         "description": lang === 'sr'
           ? "Vidikovci sa kojih se pruža spektakularan pogled na meandre."
           : "Viewpoints with a spectacular view of the meanders.",
         "image": "https://res.cloudinary.com/dejmpunhb/image/upload/v1777665114/vidikovac-ravni-krs-uvac.webp",
         "isPartOf": {
-          "@id": "https://uvacgriffon.rs/iskustvo/kanjon-uvca/#attraction"
+          "@id": "https://uvacgriffon.rs/kanjon-uvca/#attraction"
         }
       },
       {
@@ -84,7 +84,7 @@ const KanjonUvca = ({ lang, setIsBookingOpen }: KanjonUvcaProps) => {
             "@type": "ListItem",
             "position": 3,
             "name": lang === 'sr' ? "Kanjon Uvca" : "Uvac Canyon",
-            "item": "https://uvacgriffon.rs/iskustvo/kanjon-uvca"
+            "item": "https://uvacgriffon.rs/kanjon-uvca"
           }
         ]
       }
@@ -96,7 +96,7 @@ const KanjonUvca = ({ lang, setIsBookingOpen }: KanjonUvcaProps) => {
       <SeoHead 
         title={lang === 'sr' ? 'Kanjon Uvca – Krstarenje, Vidikovci i Beloglavi Sup | Uvac Griffon' : 'Uvac Canyon Boat Tour – Griffon Vultures & Meanders | Uvac Griffon'}
         description={lang === 'sr' ? 'Kanjon reke Uvac sa svojim meandrima predstavlja spektakularan prirodni fenomen i srce Specijalnog rezervata prirode.' : 'The Uvac River Canyon with its meanders represents a spectacular natural phenomenon and the heart of the Special Nature Reserve.'}
-        canonicalUrl="https://uvacgriffon.rs/iskustvo/kanjon-uvca"
+        canonicalUrl="https://uvacgriffon.rs/kanjon-uvca"
         ogImage="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1200/v1777665114/vidikovac-ravni-krs-uvac.webp"
         schema={schema}
       />
@@ -171,7 +171,7 @@ const KanjonUvca = ({ lang, setIsBookingOpen }: KanjonUvcaProps) => {
         text={lang === 'sr' ? (
           <p>
             Meandri i litice nisu jedino po čemu je kanjon Uvca poznat. Ovo je dom jedne od najvećih kolonija{' '}
-            <Link to="/iskustvo/beloglavi-sup" className="text-uvac-accent hover:underline font-medium">
+            <Link to="/beloglavi-sup" className="text-uvac-accent hover:underline font-medium">
               beloglavih supova
             </Link>{' '}
             u Evropi — ptica čiji raspon krila može dostići gotovo tri metra. Let ovih veličanstvenih ptica iznad meandara postao je jedan od simbola rezervata. Posmatrati ih kako bez napora jedre iznad smaragdne reke iskustvo je koje se retko zaboravlja, bilo da ih posmatrate sa čamca tokom krstarenja ili sa nekog od vidikovaca iznad kanjona.
@@ -179,7 +179,7 @@ const KanjonUvca = ({ lang, setIsBookingOpen }: KanjonUvcaProps) => {
         ) : (
           <p>
             The meanders and cliffs are not the only reason the Uvac Canyon is known across Europe. This is home to one of the largest{' '}
-            <Link to="/iskustvo/beloglavi-sup" className="text-uvac-accent hover:underline font-medium">
+            <Link to="/beloglavi-sup" className="text-uvac-accent hover:underline font-medium">
               Griffon Vulture
             </Link>{' '}
             colonies on the continent — birds whose wingspan can reach nearly three metres. Watching them soar effortlessly above the emerald river is an experience that stays with you long after you leave, whether you see them from the boat during a cruise or from one of the viewpoints high above the canyon.
