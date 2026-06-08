@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Globe } from 'lucide-react';
+import React, { useEffect } from 'react';
+import SeoHead from '../components/SeoHead';
 
 const content = {
   sr: {
@@ -88,46 +88,27 @@ const content = {
   }
 };
 
-export default function PrivacyPolicy() {
-  const [lang, setLang] = useState<'sr' | 'en'>('sr');
+interface PrivacyPolicyProps {
+  lang: 'sr' | 'en';
+}
 
+export default function PrivacyPolicy({ lang }: PrivacyPolicyProps) {
   useEffect(() => {
-    const saved = localStorage.getItem('uvac-lang');
-    if (saved === 'sr' || saved === 'en') setLang(saved);
     window.scrollTo(0, 0);
   }, []);
 
   const t = content[lang];
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 font-sans">
-      {/* Header / Nav */}
-      <div className="border-b border-gray-100 py-6 sticky top-0 bg-white/80 backdrop-blur-md z-10">
-        <div className="max-w-3xl mx-auto px-4 flex justify-between items-center">
-          <a href="/" className="flex items-center gap-2 text-uvac-primary font-bold hover:text-uvac-accent transition-colors">
-            <ChevronLeft className="w-5 h-5" />
-            {lang === 'sr' ? 'Nazad na sajt' : 'Back to site'}
-          </a>
-          
-          <div className="flex items-center gap-2 bg-gray-100 rounded-full p-1">
-            <button 
-              onClick={() => { setLang('sr'); localStorage.setItem('uvac-lang', 'sr'); }}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
-            >
-              SR
-            </button>
-            <button 
-              onClick={() => { setLang('en'); localStorage.setItem('uvac-lang', 'en'); }}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
-            >
-              EN
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="pt-28 pb-16 min-h-screen bg-surface-page text-gray-800 font-sans">
+      <SeoHead 
+        title={lang === 'sr' ? 'Politika privatnosti – Uvac Griffon' : 'Privacy Policy – Uvac Griffon'}
+        description={lang === 'sr' ? 'Politika privatnosti i uslovi korišćenja za zvanični sajt Uvac Griffon tura krstarenja.' : 'Privacy policy and terms of use for the official Uvac Griffon cruise tours.'}
+        canonicalUrl="https://uvacgriffon.rs/privacy"
+      />
 
       {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-4 py-16">
+      <div className="max-w-3xl mx-auto px-4">
         <h1 className="text-4xl font-serif font-bold text-uvac-dark mb-2">{t.title}</h1>
         <p className="text-gray-400 text-sm mb-12">{t.date}</p>
 
@@ -142,12 +123,8 @@ export default function PrivacyPolicy() {
           ))}
         </div>
 
-        <div className="mt-20 pt-10 border-t border-gray-100 text-center">
-          <p className="text-sm text-gray-400">
-            &copy; 2026 Uvac Griffon | Euro Uvac. All rights reserved.
-          </p>
-        </div>
-      </main>
+
+      </div>
     </div>
   );
 }

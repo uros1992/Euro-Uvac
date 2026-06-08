@@ -5,6 +5,46 @@ import path from "path";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
 
+// Configuration constants for booking validation and constraints
+const CONFIG = {
+  MAX_CAPACITY: 12,
+  SEASON_START_MONTH: 4, // May (0-indexed month index)
+  SEASON_END_MONTH: 9,   // October (0-indexed month index)
+  // Allowed departure days (0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday)
+  // Departures allowed Tuesday to Sunday (Monday is closed)
+  ALLOWED_DEPARTURE_DAYS: [0, 2, 3, 4, 5, 6],
+  ALLOWED_DEPARTURE_DAYS_NAMES_SR: ["Nedelja", "Utorak", "Sreda", "Četvrtak", "Petak", "Subota"],
+  ALLOWED_DEPARTURE_DAYS_NAMES_EN: ["Sunday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+};
+
+// In-memory Mutex to queue execution sequentially
+class Mutex {
+  private queue: Promise<any> = Promise.resolve();
+
+  async acquire(): Promise<() => void> {
+    let release: () => void;
+    const next = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const current = this.queue;
+    this.queue = current.then(() => next).catch(() => next);
+    await current;
+    return release!;
+  }
+}
+
+const bookingMutex = new Mutex();
+
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 async function startServer() {
   // Dual-language email support enabled (SR/EN)
   const app = express();
@@ -26,9 +66,10 @@ async function startServer() {
   let supabaseClient: ReturnType<typeof createClient> | null = null;
   const getSupabase = () => {
     if (!supabaseClient) {
-      const url = process.env.SUPABASE_URL;
-      const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+      const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
       if (!url || !key) {
+        console.error("[Supabase Config Error]: Missing credentials", { url: !!url, key: !!key });
         throw new Error("Supabase credentials missing: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment variables");
       }
       supabaseClient = createClient(url, key);
@@ -55,28 +96,114 @@ async function startServer() {
         return res.status(400).json({ success: false, error: "Obavezna polja nisu popunjena." });
       }
 
+      const numGuests = parseInt(num);
+
+      // --- SERVER-SIDE VALIDATION ---
+      const bookingDateOnly = new Date(date);
+      const bYear = bookingDateOnly.getUTCFullYear();
+      const bMonth = bookingDateOnly.getUTCMonth();
+      const bDay = bookingDateOnly.getUTCDate();
+      const dayOfWeek = bookingDateOnly.getUTCDay();
+
+      // 1. Date validity - reject dates in the past (comparing days normalized to midnight)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const bookingDateCompare = new Date(bYear, bMonth, bDay);
+      if (bookingDateCompare.getTime() < today.getTime()) {
+        return res.status(400).json({
+          success: false,
+          error: "Izabrani datum je u prošlosti. Molimo izaberite aktuelan datum.",
+          errorEn: "The selected date is in the past. Please select an active date."
+        });
+      }
+
+      // 2. Day of week check - departures allowed Tuesday to Sunday (or based on config constant)
+      if (!CONFIG.ALLOWED_DEPARTURE_DAYS.includes(dayOfWeek)) {
+        return res.status(400).json({
+          success: false,
+          error: `Polasci nisu dozvoljeni ovim danom u nedelji. Polasci su mogući sledećim danima: ${CONFIG.ALLOWED_DEPARTURE_DAYS_NAMES_SR.join(', ')}.`,
+          errorEn: `Departures are not allowed on this day of the week. Departures are permitted on: ${CONFIG.ALLOWED_DEPARTURE_DAYS_NAMES_EN.join(', ')}.`
+        });
+      }
+
+      // 3. Season check - only allow May 1 to Oct 31
+      if (bMonth < CONFIG.SEASON_START_MONTH || bMonth > CONFIG.SEASON_END_MONTH) {
+        return res.status(400).json({
+          success: false,
+          error: "Rezervacije su moguće samo tokom letnje sezone (od 1. maja do 31. oktobra).",
+          errorEn: "Reservations are only available within the summer season (May 1st to October 31st)."
+        });
+      }
+
+      // 4. Guest count check - must be >= 1 and <= tour's max capacity
+      if (isNaN(numGuests) || numGuests < 1 || numGuests > CONFIG.MAX_CAPACITY) {
+        return res.status(400).json({
+          success: false,
+          error: `Broj putnika mora biti od 1 do maksimalno ${CONFIG.MAX_CAPACITY} osoba.`,
+          errorEn: `Number of guests must be between 1 and the maximum capacity of ${CONFIG.MAX_CAPACITY} guests.`
+        });
+      }
+
       const supabase = getSupabase();
       const resend = getResend();
 
-      // 1. Sačuvaj u Supabase
-      const { data: bookingData, error: supabaseError } = await supabase
-        .from('bookings')
-        .insert([
-          { 
-            name, 
-            email, 
-            phone, 
-            booking_date: date, 
-            message, 
-            guest_count: parseInt(num),
-            created_at: new Date().toISOString()
-          }
-        ])
-        .select();
+      // 5. Atomic capacity check & Insertion
+      const release = await bookingMutex.acquire();
+      let bookingData;
+      try {
+        const { data: bookingsOnDate, error: fetchError } = await supabase
+          .from('bookings')
+          .select('guest_count')
+          .eq('booking_date', date);
 
-      if (supabaseError) {
-        console.error("Supabase error:", supabaseError);
-        throw new Error("Greška pri čuvanju rezervacije u bazi podataka.");
+        if (fetchError) {
+          console.error("Supabase fetch database exception during capacity check:", fetchError);
+          return res.status(500).json({
+            success: false,
+            error: "Sistemska greška pri proveri kapaciteta.",
+            errorEn: "System error checking tour capacity."
+          });
+        }
+
+        const bookedSeats = (bookingsOnDate || []).reduce((sum, b) => sum + (parseInt(b.guest_count) || 0), 0);
+        const remainingCapacity = CONFIG.MAX_CAPACITY - bookedSeats;
+
+        if (remainingCapacity < numGuests) {
+          return res.status(409).json({
+            success: false,
+            error: `Nažalost, nema dovoljno slobodnih mesta za izabrani datum. Preostalo je još ${remainingCapacity >= 0 ? remainingCapacity : 0} slobodnih mesta.`,
+            errorEn: `Unfortunately, there are not enough available seats for this date. Only ${remainingCapacity >= 0 ? remainingCapacity : 0} seats left.`
+          });
+        }
+
+        // Insert booking atomically inside lock
+        const { data, error: supabaseError } = await supabase
+          .from('bookings')
+          .insert([
+            { 
+              name, 
+              email, 
+              phone, 
+              booking_date: date, 
+              message, 
+              guest_count: numGuests,
+              created_at: new Date().toISOString()
+            }
+          ])
+          .select();
+
+        if (supabaseError) {
+          console.error("Supabase insert error:", supabaseError);
+          return res.status(500).json({
+            success: false,
+            error: "Greška pri čuvanju rezervacije u bazi podataka.",
+            errorEn: "Error saving reservation to the database."
+          });
+        }
+
+        bookingData = data;
+      } finally {
+        release();
       }
 
       // 2. Pošalji mejlove (ako je čuvanje uspešno)
@@ -94,15 +221,22 @@ async function startServer() {
       const formattedDateSR = `${day}. ${monthsSR[bookingDateObj.getUTCMonth()]} ${year}. u 13:00h`;
       const formattedDateEN = `${day} ${monthsEN[bookingDateObj.getUTCMonth()]} ${year} at 1:00 PM`;
 
+      // Escaping user-supplied fields to prevent HTML injection
+      const safeName = escapeHtml(name);
+      const safeEmail = escapeHtml(email);
+      const safePhone = escapeHtml(phone || '');
+      const safeMessage = escapeHtml(message || '');
+      const safeNum = escapeHtml(String(num));
+
       const adminEmailHtml = `
         <div style="font-family: sans-serif; color: #333;">
           <h2>Nova rezervacija primljena!</h2>
-          <p><strong>Ime:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Telefon:</strong> ${phone || 'Nije navedeno'}</p>
+          <p><strong>Ime:</strong> ${safeName}</p>
+          <p><strong>Email:</strong> ${safeEmail}</p>
+          <p><strong>Telefon:</strong> ${safePhone || 'Nije navedeno'}</p>
           <p><strong>Datum:</strong> ${formattedDateSR}</p>
-          <p><strong>Broj osoba:</strong> ${num}</p>
-          <p><strong>Poruka:</strong> ${message || '/'}</p>
+          <p><strong>Broj osoba:</strong> ${safeNum}</p>
+          <p><strong>Poruka:</strong> ${safeMessage || '/'}</p>
           <hr />
           <p>Proveri Supabase Dashboard za više detalja.</p>
         </div>
@@ -120,7 +254,7 @@ async function startServer() {
     <div style="padding: 20px; border: 1px solid #e5e7eb; 
     border-top: none;">
       <h2 style="color: #0f291e;">Rezervacija potvrđena! ✅</h2>
-      <p>Zdravo <strong>${name}</strong>,</p>
+      <p>Zdravo <strong>${safeName}</strong>,</p>
       <p>Vaša avantura na Uvcu je uspešno rezervisana. 
       Detalji vaše rezervacije:</p>
       <div style="background-color: #f0f9ff; padding: 15px; 
@@ -129,7 +263,7 @@ async function startServer() {
           <strong>📅 Datum:</strong> ${formattedDateSR}
         </p>
         <p style="margin: 5px 0;">
-          <strong>👥 Osoba:</strong> ${num}
+          <strong>👥 Osoba:</strong> ${safeNum}
         </p>
         <p style="margin: 5px 0;">
           <strong>📍 Mesto polaska:</strong> 
@@ -151,7 +285,7 @@ async function startServer() {
     <div style="padding: 20px; border: 1px solid #e5e7eb; 
     border-radius: 0 0 8px 8px;">
       <h2 style="color: #0f291e;">Booking Confirmed! ✅</h2>
-      <p>Hello <strong>${name}</strong>,</p>
+      <p>Hello <strong>${safeName}</strong>,</p>
       <p>Your Uvac adventure has been successfully booked. 
       Here are your booking details:</p>
       <div style="background-color: #f0f9ff; padding: 15px; 
@@ -160,7 +294,7 @@ async function startServer() {
           <strong>📅 Date:</strong> ${formattedDateEN}
         </p>
         <p style="margin: 5px 0;">
-          <strong>👥 Guests:</strong> ${num}
+          <strong>👥 Guests:</strong> ${safeNum}
         </p>
         <p style="margin: 5px 0;">
           <strong>📍 Departure:</strong> 
@@ -168,7 +302,7 @@ async function startServer() {
         </p>
       </div>
       <p>Payment is made on-site 
-      (2000 RSD per person + 420 RSD for reserve 
+      (2000 RSD per person + 420 RSD for nature reserve 
       and cave entry).</p>
       <p>To cancel or modify your booking, please 
       contact us via the website or phone at least 
@@ -186,24 +320,63 @@ async function startServer() {
   </div>
 `;
 
+      // Helper function for sending with fallback
+      const sendEmailWithFallback = async (options: any) => {
+        try {
+          const res = await resend.emails.send(options);
+          if (res.error) {
+            console.warn(`[Resend Warning]: Email failed from ${options.from}. Reason: ${res.error.message}. Retrying with fallback...`);
+            // Fallback to onboarding address if domain is the issue
+            return await resend.emails.send({
+              ...options,
+              from: 'Uvac Griffon <onboarding@resend.dev>'
+            });
+          }
+          return res;
+        } catch (err: any) {
+          console.error(`[Resend Exception]: Critical error sending from ${options.from}.`, err);
+          // Last ditch effort with onboarding address
+          return await resend.emails.send({
+            ...options,
+            from: 'Uvac Griffon <onboarding@resend.dev>'
+          });
+        }
+      };
+
       // Šaljemo adminu
-      await resend.emails.send({
+      const adminRes = await sendEmailWithFallback({
         from: 'Uvac Griffon <booking@uvacgriffon.rs>',
         to: ['booking@uvacgriffon.rs'],
         subject: `NOVO: Rezervacija - ${name} (${formattedDateSR})`,
         html: adminEmailHtml
       });
+      
+      if (adminRes.error) {
+        console.error("[Resend Admin FINAL FAIL]:", adminRes.error);
+      }
 
       // Šaljemo korisniku
-      await resend.emails.send({
+      let emailUserError = null;
+      const userRes = await sendEmailWithFallback({
         from: 'Uvac Griffon <booking@uvacgriffon.rs>',
         to: [email],
-        bcc: [
-  'milivoje.ciro@gmail.com'
-],
+        bcc: ['milivoje.ciro@gmail.com'],
         subject: 'Rezervacija primljena – Krstarenje Uvcem | Uvac Griffon',
         html: userEmailHtml
       });
+
+      if (userRes.error) {
+        console.error("[Resend User FINAL FAIL]:", userRes.error);
+        emailUserError = userRes.error ? userRes.error.message : "Unknown error";
+      }
+
+      if (emailUserError) {
+        return res.status(200).json({ 
+          success: true, 
+          message: "Rezervacija je sačuvana, ali email potvrda nije mogla biti poslata.",
+          emailError: emailUserError 
+        });
+      }
 
       res.status(200).json({ success: true, message: "Rezervacija uspešno zabeležena i mejlovi poslati." });
 
@@ -259,7 +432,7 @@ async function startServer() {
                 <p style="margin: 5px 0;"><strong>👥 Osoba:</strong> ${seats}</p>
                 <p style="margin: 5px 0;"><strong>📍 Mesto polaska:</strong> Brana HE "Uvac", Akmačići</p>
               </div>
-              <p>Plaćanje se vrši na licu mesta (2000 DIN po osobi + 420 DIN za ulaz u rezervat i pećinu).</p>
+              <p>Plaćanje se vrši na licu mesta (2000 RSD po osobi + 420 RSD za ulaz u rezervat i pećinu).</p>
               <p>Ako želite da otkažete ili promenite rezervaciju, molimo vas da nas kontaktirate putem sajta ili telefona najmanje 24h ranije.</p>
               <p>Vidimo se na vodi!</p>
             </div>
@@ -276,7 +449,7 @@ async function startServer() {
                 <p style="margin: 5px 0;"><strong>👥 Guests:</strong> ${seats}</p>
                 <p style="margin: 5px 0;"><strong>📍 Departure:</strong> Dam HE "Uvac", Akmačići</p>
               </div>
-              <p>Payment is made on-site (2000 DIN per person + 420 DIN for reserve and cave entry).</p>
+              <p>Payment is made on-site (2000 RSD per person + 420 RSD for nature reserve and cave entry).</p>
               <p>If you need to manage or cancel your reservation, please do so via the website or contact us at least 24 hours prior to departure.</p>
               <p>See you out on the water!</p>
               
@@ -343,25 +516,45 @@ async function startServer() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://uvacgriffon.rs/</loc>
-    <lastmod>2026-04-20</lastmod>
+    <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://uvacgriffon.rs/#tours</loc>
+    <loc>https://uvacgriffon.rs/tura</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://uvacgriffon.rs/#about</loc>
+    <loc>https://uvacgriffon.rs/recenzije</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://uvacgriffon.rs/iskustvo</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uvacgriffon.rs/#location</loc>
+    <loc>https://uvacgriffon.rs/iskustvo/beloglavi-sup</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uvacgriffon.rs/privacy</loc>
-    <priority>0.3</priority>
+    <loc>https://uvacgriffon.rs/iskustvo/kanjon-uvca</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uvacgriffon.rs/iskustvo/ledena-pecina</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>`);
   });

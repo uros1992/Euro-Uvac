@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { X, Calendar as CalendarIcon, Users, User, CheckCircle2, ChevronLeft, ChevronRight, CreditCard, LogOut } from 'lucide-react';
-import { collection, query, onSnapshot, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { db, auth, signInWithGoogle } from '../firebase';
+import { supabase } from '../supabase';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -85,6 +86,79 @@ const translations = {
 
 export default function BookingModal({ isOpen, onClose, lang }: BookingModalProps) {
   const t = translations[lang];
+  const shouldReduceMotion = useReducedMotion();
+  
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      previousActiveElement.current = document.activeElement as HTMLElement;
+    }
+    return () => {
+      if (previousActiveElement.current) {
+        previousActiveElement.current.focus({ preventScroll: true });
+      }
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        if (!modalRef.current) return;
+
+        const focusableElements = modalRef.current.querySelectorAll(
+          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        
+        if (focusableElements.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const firstElement = focusableElements[0] as HTMLElement;
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+        if (e.shiftKey) { // Shift + Tab
+          if (document.activeElement === firstElement) {
+            lastElement.focus({ preventScroll: true });
+            e.preventDefault();
+          }
+        } else { // Tab
+          if (document.activeElement === lastElement) {
+            firstElement.focus({ preventScroll: true });
+            e.preventDefault();
+          }
+        }
+      }
+    };
+
+    const focusTimeout = setTimeout(() => {
+      if (modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll(
+          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length > 0) {
+          (focusableElements[0] as HTMLElement).focus({ preventScroll: true });
+        } else {
+          modalRef.current.focus({ preventScroll: true });
+        }
+      }
+    }, 50);
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(focusTimeout);
+    };
+  }, [isOpen, onClose]);
   
   const [step, setStep] = useState(1);
   const [viewDate, setViewDate] = useState(new Date());
@@ -112,16 +186,48 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
     return () => unsub();
   }, []);
 
-  // Fetch all confirmed reservations to compute availability
+  // Fetch all confirmed reservations from Supabase to compute availability
   useEffect(() => {
-    const q = query(collection(db, 'reservations'));
-    const unsub = onSnapshot(q, (snapshot) => {
-      const res = snapshot.docs.map(doc => doc.data()).filter(d => d.status === 'confirmed');
-      setReservations(res);
-    }, (err) => {
-      // Quietly ignore permissions error if rule hasn't updated yet
-    });
-    return () => unsub();
+    const fetchBookings = async () => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*');
+      
+      if (data) {
+        // Map Supabase fields to the shape used in useMemo logic
+        const mapped = data.map(b => ({
+          date: b.booking_date,
+          seatsCount: b.guest_count,
+          status: 'confirmed'
+        }));
+        setReservations(mapped);
+      } else if (error) {
+        console.error('Error fetching occupied dates from Supabase:', error);
+      }
+    };
+
+    fetchBookings();
+
+    // Subscribe to new bookings for real-time calendar updates
+    const channel = supabase
+      .channel('public:bookings')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'bookings' 
+      }, (payload) => {
+        const newBooking = {
+          date: payload.new.booking_date,
+          seatsCount: payload.new.guest_count,
+          status: 'confirmed'
+        };
+        setReservations(prev => [...prev, newBooking]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
@@ -170,7 +276,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
       
       const dayIso = new Date(Date.UTC(year, month, i)).toISOString().split('T')[0];
       const dayBookings = reservations.filter(r => r.date.startsWith(dayIso));
-      const bookedSeatsCount = dayBookings.reduce((sum, r) => sum + r.seats.length, 0);
+      const bookedSeatsCount = dayBookings.reduce((sum, r) => sum + (r.seatsCount || r.seats?.length || 0), 0);
       
       if (currentDate < today) {
         map[i] = 0; // Past days
@@ -243,26 +349,6 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
         throw new Error(errorData.error || "API call failed");
       }
 
-      // Keep Firebase write for real-time calendar sync (if still using it)
-      const newReservation = {
-        userId: finalUserId,
-        date: isoDate,
-        seats: selectedSeats,
-        status: 'confirmed',
-        createdAt: new Date().toISOString(),
-        isGuest: !currentUser
-      };
-      
-      const batch = writeBatch(db);
-      batch.set(doc(db, 'reservations', reservationId), newReservation);
-      batch.set(doc(db, `reservations/${reservationId}/details/info`), {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone
-      });
-      
-      await batch.commit();
-      
       setIsSubmitting(false);
       handleNext();
     } catch(err: any) {
@@ -305,9 +391,14 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
 
       {/* Modal Container */}
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="booking-modal-title"
+        tabIndex={-1}
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
+        animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+        exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
         className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-y-auto flex flex-col max-h-[90vh]"
       >
         {/* Header */}
@@ -318,7 +409,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                 <ChevronLeft className="w-5 h-5 text-gray-600" />
               </button>
             )}
-            <h3 className="font-serif font-bold text-lg text-uvac-dark">{t.title}</h3>
+            <h3 id="booking-modal-title" className="font-serif font-bold text-lg text-uvac-dark">{t.title}</h3>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <X className="w-5 h-5 text-gray-500" />
@@ -333,9 +424,9 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
             {step === 1 && (
               <motion.div
                 key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
+                animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
                 className="flex flex-col h-full"
               >
                 <div className="flex items-center gap-3 mb-6">
@@ -406,9 +497,9 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
             {step === 2 && selectedFullDate && (
               <motion.div
                 key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
+                animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
                 className="flex flex-col h-full"
               >
                 <div className="flex items-center gap-3 mb-2">
@@ -455,7 +546,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                   <button 
                     disabled={selectedSeats.length === 0}
                     onClick={handleNext}
-                    className="w-full bg-uvac-accent hover:bg-[#c49363] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg"
+                    className="w-full bg-uvac-accent hover:bg-brand-gold disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg"
                   >
                     {t.continue} ({selectedSeats.length})
                   </button>
@@ -467,9 +558,9 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
             {step === 3 && (
               <motion.div
                 key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
+                animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
                 className="flex flex-col h-full"
               >
                 <div className="flex items-center gap-3 mb-6">
@@ -516,7 +607,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                   <button 
                     disabled={!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()}
                     onClick={handleNext}
-                    className="w-full bg-uvac-accent hover:bg-[#c49363] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg"
+                    className="w-full bg-uvac-accent hover:bg-brand-gold disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg"
                   >
                     {t.continue}
                   </button>
@@ -528,9 +619,9 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
             {step === 4 && selectedFullDate && (
               <motion.div
                 key="step4"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
+                animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
                 className="flex flex-col h-full"
               >
                 <div className="flex items-center gap-3 mb-6">
@@ -644,8 +735,8 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
             {step === 5 && (
               <motion.div
                 key="step5"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
+                animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
                 className="flex flex-col items-center justify-center text-center py-8"
               >
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Star } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useReviews } from '../context/ReviewsContext';
 
 export default function ReviewSection(
@@ -15,6 +15,108 @@ export default function ReviewSection(
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
+
+  // Carousel and responsive state
+  const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [activeHeight, setActiveHeight] = useState<number | undefined>(undefined);
+  const groupRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const visibleCount = windowWidth >= 1024 ? 3 : (windowWidth >= 640 ? 2 : 1);
+
+  // Divide the limited (or all) reviews into chunks
+  const displayedReviews = reviews.slice(0, 9);
+  
+  const chunkReviews = (arr: any[], size: number) => {
+    const result = [];
+    for (let i = 0; i < arr.length; i += size) {
+      result.push(arr.slice(i, i + size));
+    }
+    return result;
+  };
+
+  const groups = chunkReviews(displayedReviews, visibleCount);
+
+  // Auto scroll bounds adjustment
+  useEffect(() => {
+    if (currentGroupIndex >= groups.length && groups.length > 0) {
+      setCurrentGroupIndex(groups.length - 1);
+    }
+  }, [groups.length, currentGroupIndex]);
+
+  // Height dynamic adjustment
+  useEffect(() => {
+    const el = groupRefs.current[currentGroupIndex];
+    if (!el) return;
+    const observer = new ResizeObserver(entries => {
+      if (entries[0]) {
+        setActiveHeight(entries[0].contentRect.height);
+      }
+    });
+    observer.observe(el);
+    setActiveHeight(el.offsetHeight);
+    return () => observer.disconnect();
+  }, [currentGroupIndex, reviews, loaded, visibleCount]);
+
+  const prevGroup = () => {
+    if (currentGroupIndex > 0) {
+      setCurrentGroupIndex(currentGroupIndex - 1);
+    }
+  };
+
+  const nextGroup = () => {
+    if (currentGroupIndex < groups.length - 1) {
+      setCurrentGroupIndex(currentGroupIndex + 1);
+    }
+  };
+
+  // Dynamic average and count calculations
+  const totalReviewsCount = reviews.length;
+  const averageRating = totalReviewsCount > 0 
+    ? Math.round((reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / totalReviewsCount) * 10) / 10 
+    : 0;
+
+  const getReviewWordSr = (count: number) => {
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+      return 'recenzija';
+    }
+    if (lastDigit === 1) {
+      return 'recenziji';
+    }
+    if (lastDigit >= 2 && lastDigit <= 4) {
+      return 'recenzije';
+    }
+    return 'recenzija';
+  };
+
+  const renderAverageStars = (avg: number) => {
+    return (
+      <div className="flex gap-1 text-yellow-400">
+        {[1, 2, 3, 4, 5].map((starIndex) => {
+          const fillAmount = Math.max(0, Math.min(1, avg - (starIndex - 1)));
+          return (
+            <div key={starIndex} className="relative w-6 h-6 flex-shrink-0">
+              <Star className="w-6 h-6 text-stone-200" />
+              <div 
+                className="absolute top-0 left-0 overflow-hidden h-full" 
+                style={{ width: `${fillAmount * 100}%` }}
+              >
+                <Star className="w-6 h-6 fill-current text-yellow-400" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +137,7 @@ export default function ReviewSection(
       setNewRating(5);
       setSubmitSuccess(true);
       setTimeout(() => setSubmitSuccess(false), 5000);
+      setCurrentGroupIndex(0); // Reset to page 1 to see the new review
     } catch (err) {
       console.error(err);
       setSubmitError(t.error);
@@ -43,42 +146,119 @@ export default function ReviewSection(
     }
   };
 
+  const showControls = groups.length > 1 && !loading;
+
   return (
-    <section id="reviews" className="py-24 bg-[#fdfaf5]">
+    <section id="reviews" className="py-24 bg-brand-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-4xl font-serif font-bold text-uvac-dark mb-4">{t.title}</h2>
-          <p className="text-lg text-gray-600">{t.subtitle}</p>
+        
+        {/* Header Section with Title and Subtitle */}
+        <div className="mb-12 flex flex-col items-center justify-center text-center">
+          <div className="max-w-3xl">
+            <h2 className="text-4xl font-serif font-bold text-uvac-dark mb-4">{t.title}</h2>
+            <p className="text-lg text-gray-600">{t.subtitle}</p>
+          </div>
         </div>
 
-        {/* Existing / Fetched Reviews */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        {/* Dynamic Summary Bar */}
+        {!loading && totalReviewsCount > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 py-4 px-8 mb-12 bg-white rounded-2xl sm:rounded-full border border-stone-200 shadow-sm max-w-xl mx-auto text-center sm:text-left">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl font-bold font-serif text-uvac-dark leading-none">{averageRating.toFixed(1)}</span>
+              {renderAverageStars(averageRating)}
+            </div>
+            <div className="hidden sm:block w-px h-8 bg-stone-200" />
+            <div className="text-stone-600 font-medium tracking-wide">
+              {lang === 'sr' 
+                ? `Zasnovano na ${totalReviewsCount} ${getReviewWordSr(totalReviewsCount)}` 
+                : `Based on ${totalReviewsCount} ${totalReviewsCount === 1 ? 'review' : 'reviews'}`
+              }
+            </div>
+          </div>
+        )}
+
+        {/* Carousel Wrapper with Dynamic Outside Overlapping Navigation Controls */}
+        <div className="relative mb-16 px-4 md:px-12">
+          {showControls && (
+            <>
+              <button 
+                onClick={prevGroup}
+                disabled={currentGroupIndex === 0}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full border border-stone-200 bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md focus:outline-none"
+                aria-label={lang === 'sr' ? 'Prethodna stranica' : 'Previous page'}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={nextGroup}
+                disabled={currentGroupIndex === groups.length - 1}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full border border-stone-200 bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md focus:outline-none"
+                aria-label={lang === 'sr' ? 'Sledeća stranica' : 'Next page'}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </>
+          )}
+
           {loading ? (
-            <div className="col-span-full py-20 text-center text-gray-500 italic">
+            <div className="py-20 text-center text-gray-500 italic">
               {lang === 'sr' ? 'Učitavanje recenzija...' : 'Loading reviews...'}
             </div>
+          ) : groups.length === 0 ? (
+            <div className="py-12 text-center text-gray-500 italic">
+              {lang === 'sr' ? 'Nema dostupnih recenzija.' : 'No reviews available.'}
+            </div>
           ) : (
-            reviews.slice(0, 9).map((review) => (
-              <div key={review.id} className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
-                <div className="flex gap-1 text-yellow-400 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-5 h-5 ${i < review.rating ? "fill-current" : "text-gray-300"}`} />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-6 italic">"{review.text}"</p>
-                <div className="font-bold text-uvac-dark">{review.name}</div>
-                {(review.dateSr || review.dateEn) && (
-                  <p className="text-sm text-gray-400 mt-0.5">
-                    {lang === 'sr' ? review.dateSr : review.dateEn}
-                  </p>
-                )}
+            <div 
+              className="relative overflow-hidden w-full transition-all duration-300"
+              style={{ height: activeHeight ? `${activeHeight}px` : 'auto' }}
+            >
+              <div 
+                className="flex transition-transform duration-500 ease-in-out items-start"
+                style={{ transform: `translateX(-${currentGroupIndex * 100}%)` }}
+              >
+                {groups.map((group, groupIndex) => (
+                  <div 
+                    key={groupIndex}
+                    ref={(el) => { groupRefs.current[groupIndex] = el; }}
+                    className="w-full flex-shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch px-1 pb-4 pt-2"
+                  >
+                    {group.map((review) => (
+                      <div 
+                        key={review.id} 
+                        className="bg-white p-8 rounded-xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow flex flex-col justify-between min-h-[220px]"
+                      >
+                        <div>
+                          <div className="flex gap-1 text-yellow-400 mb-4">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`w-5 h-5 ${i < review.rating ? "fill-current" : "text-gray-300"}`} 
+                              />
+                            ))}
+                          </div>
+                          <p className="text-gray-700 mb-6 italic">"{review.text}"</p>
+                        </div>
+                        
+                        <div>
+                          <div className="font-bold text-uvac-dark">{review.name}</div>
+                          {(review.dateSr || review.dateEn) && (
+                            <p className="text-sm text-gray-400 mt-0.5">
+                              {lang === 'sr' ? review.dateSr : review.dateEn}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
-            ))
+            </div>
           )}
         </div>
 
         {/* Review Form */}
-        <div className="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-sm border border-stone-100">
+        <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-stone-100">
           <h3 className="text-2xl font-serif font-bold text-uvac-dark mb-6 text-center">{t.leaveReview}</h3>
           
           {submitSuccess && (

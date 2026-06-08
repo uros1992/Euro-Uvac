@@ -1,339 +1,59 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Star, 
-  Map,
-  Clock, 
-  Users, 
-  CheckCircle2, 
-  ChevronRight,
-  Menu,
-  X,
-  Anchor,
-  Globe,
-  MapPin,
-  Car,
-  Navigation,
-  Phone,
-  User,
-  MessageCircle
-} from 'lucide-react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
 
-import { Suspense, lazy, memo } from 'react';
-
-// Lazy load non-critical components
+// Lazy load components
 const BookingModal = lazy(() => import('./components/BookingModal'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
-import ReviewSection from './components/ReviewSection';
+const TourPage = lazy(() => import('./pages/TourPage'));
+const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const ExperiencePage = lazy(() => import('./pages/ExperiencePage'));
 
-// Custom Social Icons (lucide-react doesn't export Facebook/Instagram in this version)
-const Facebook = memo(({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="currentColor" 
-    className={className}
-  >
-    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-  </svg>
-));
-
-const Instagram = memo(({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="currentColor" 
-    className={className}
-  >
-    <defs>
-      <linearGradient id="instagram-gradient" x1="100%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#405de6" />
-        <stop offset="25%" stopColor="#833ab4" />
-        <stop offset="50%" stopColor="#e1306c" />
-        <stop offset="75%" stopColor="#fd1d1d" />
-        <stop offset="100%" stopColor="#fcaf45" />
-      </linearGradient>
-    </defs>
-    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.266.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-    <style>{`
-      .insta-colored {
-        fill: url(#instagram-gradient);
-      }
-    `}</style>
-  </svg>
-));
-
-Facebook.displayName = 'Facebook';
-Instagram.displayName = 'Instagram';
-
-
-// Image imports
-// Assets loaded externally via GitHub CDN
-
-const translations = {
-  sr: {
-    nav: { tours: "Tura", experience: "Iskustvo", reviews: "Recenzije", location: "Kako do nas", book: "Rezerviši", profileTitle: "Moje rezervacije / Admin", myBookings: "Moje rezervacije" },
-    hero: {
-      badge: "SRPSKO ČUDO PRIRODE",
-      title: "Doživite netaknutu lepotu Uvca",
-      subtitle: "Krstarite veličanstvenim meandrima Uvca, istražite skrivenu Ledenu pećinu i posmatrajte let retkog beloglavog supa. Sezona maj–oktobar 2026. | Polasci svaki dan u 13:00h, osim ponedeljka.",
-      checkAvail: "Proveri dostupnost",
-      viewTours: "Pogledaj ponudu ture"
-    },
-    usp: {
-      title: "Zašto krstariti sa nama?",
-      subtitle: "Pružamo autentično, bezbedno i nezaboravno iskustvo na reci Uvac.",
-      f1Title: "Kolonija beloglavih supova",
-      f1Desc: "Približite se najvećoj koloniji ovih veličanstvenih ptica na Balkanu. Tokom krstarenja prolazite direktno ispod gnezda i posmatrate njihov let izbliza, na svega nekoliko metara. San svakog fotografa.",
-      f2Title: "Panoramski vidikovci",
-      f2Desc: "Otkrijte vidikovce Ravni Krš i Veliki Vrh — mesta odakle se pruža panoramski pogled na meandre kanjona Uvca. Kada stignete na vrh i pogledate dole, razumećete zašto je Uvac na svakoj listi prirodnih čuda Srbije.",
-      f3Title: "Ledena pećina",
-      f3Desc: "Otkrijte magični svet ledenih ukrasa i skrivenih dvorana uz pratnju iskusnih vodiča. Ovo je jedina pećina u Srbiji do koje se dolazi isključivo čamcem, a temperatura unutra je konstantnih 8°C tokom cele godine."
-    },
-    tours: {
-      title: "Vaša avantura",
-      subtitle: "Doživite Uvac i njegove meandre, posetite Ledenu pećinu i uživajte u jednom od najlepših pogleda u Srbiji. Krstarenja su dostupna tokom sezone od 1. maja do 31. oktobra, uz svakodnevne polaske u 13:00 časova (osim ponedeljkom). Cena: 2000 RSD po osobi — rezervacija obavezna zbog ograničenog broja mesta.",
-      t1Title: "Krstarenje Uvcem — Kompletan doživljaj",
-      t1Price: "2000 RSD",
-      t1Unit: "/osobi*",
-      priceDisclaimer: "* Ulaz u rezervat i Ledenu pećinu naplaćuje se dodatno (420 RSD) na licu mesta.",
-      t1Duration: "4-5 Sati",
-      t1Max: "Maks. 12",
-      t1F1: "Krstarenje meandrima",
-      t1F2: "Poseta Ledenoj pećini",
-      t1F3: "Pešačenje do vidikovca",
-      t1F4: "Posmatranje beloglavih supova",
-      selectDate: "Izaberi datum"
-    },
-    reviews: {
-      title: "Šta kažu naši gosti",
-      subtitle: "Pridružite se mnogim zadovoljnim putnicima koji su sa nama otkrili magiju Uvca.",
-      leaveReview: "Ostavi ocenu",
-      namePlaceholder: "Tvoje ime",
-      reviewPlaceholder: "Podeli svoje iskustvo sa nama...",
-      submit: "Objavi recenziju",
-      submitting: "Objavljivanje...",
-      success: "Hvala! Vaša recenzija je objavljena.",
-      error: "Došlo je do greške."
-    },
-    location: {
-      title: "Kako do nas",
-      subtitle: "Dolazak do srca Specijalnog rezervata prirode Uvac je lakši nego što mislite. Vaše putovanje će vas provesti kroz neke od najlepših predela u Srbiji — a konačna destinacija je apsolutno vredna toga.",
-      meetingPoint: "Mesto polaska na krstarenje",
-      meetingPointDesc: "Sve ture polaze sa brane na Uvačkom jezeru (područje Rastoka), koja je zvanično mesto sastanka za krstarenja. Na mestu polaska postoji besplatan parking za vozila. Preporučujemo dolazak najmanje 15 minuta pre polaska.",
-      fromZlatibor: "Iz Nove Varoši",
-      fromZlatiborDesc: "Na samom ulazu u Novu Varoš skrenite levo i pratite put kroz sela Akmačići i Komarani (oko 11,5 km) sve do Uvačkog jezera.",
-      fromBelgrade: "Iz Beograda / Novog Sada (3.5 - 4.5 sata)",
-      fromBelgradeDesc: "Pratite autoput E763 (Miloš Veliki) ka Čačku i Požegi, zatim nastavite magistralnim putem za Užice, Zlatibor i Novu Varoš. Put je dobro obeležen.",
-      openMap: "Otvori na Google Mapi",
-      callSupport: "Pozovite za pomoć",
-      bookTour: "Rezervišite turu",
-      scenicRoute: "Avantura je tu!"
-    },
-    cta: {
-      title: "Spremni za vrhunac vašeg putovanja po Srbiji?",
-      subtitle: "Mesta su strogo ograničena radi zaštite prirodnog staništa. Rezervišite unapred da osigurate svoje mesto.",
-      btn: "Proveri dostupnost i rezerviši",
-      cancel: "Otkazivanje moguće do 24 sata pre polaska putem sekcije",
-      cancelLink: "Moje rezervacije",
-      cancelSuffix: "."
-    },
-    footer: {
-      desc: "Uvac Griffon je brend porodičnog preduzeća Euro Uvac iz Nove Varoši, osnovanog 2021. godine. Posvećeni smo organizovanju krstarenja i promociji održivog turizma u ",
-      reserveLink: "Specijalnom rezervatu prirode Uvac",
-      copyright: "Uvac Griffon © 2026",
-      organizer: "Organizator krstarenja: Euro Uvac",
-      legal: "PIB: 112457556 | Matični broj: 66116204",
-      linksTitle: "Brzi linkovi",
-      l1: "Iskustvo",
-      l2: "Tura",
-      l3: "Recenzije",
-      l4: "Kako do nas",
-      contactTitle: "Kontakt",
-      c1: "Nova Varoš, Srbija"
-    }
-  },
-  en: {
-    nav: { tours: "Tour", experience: "The Experience", reviews: "Reviews", location: "How to Reach Us", book: "Book Now", profileTitle: "My Bookings / Admin", myBookings: "My Bookings" },
-    hero: {
-      badge: "SERBIA'S NATURAL WONDER",
-      title: "Experience the Untouched Beauty of Uvac",
-      subtitle: "Cruise through majestic meanders of Uvac, explore hidden Ice Cave, and witness the flight of the rare Griffon Vulture. Season May–October 2026 | Departures every day at 13:00, except Monday.",
-      checkAvail: "Check Availability",
-      viewTours: "View Tour Option"
-    },
-    usp: {
-      title: "Why Cruise With Us?",
-      subtitle: "We provide an authentic, safe and unforgettable experience on the Uvac river.",
-      f1Title: "Griffon Vulture Colony",
-      f1Desc: "Get up close to the largest colony of these majestic birds in the Balkans. During the cruise, you pass directly under the nest and watch their flight up close, only a few meters away. A photographer's dream.",
-      f2Title: "Panoramic Viewpoints",
-      f2Desc: "Discover the viewpoints Ravni Krš and Veliki Vrh — places from where you can enjoy a panoramic view of the meanders of the Uvac canyon. When you reach the top and look down, you will understand why Uvac is on every list of natural wonders of Serbia.",
-      f3Title: "Ice Cave",
-      f3Desc: "Discover a magical world of icy formations and hidden chambers, with the help of experienced guides. This is the only cave in Serbia that can only be reached by boat, and the temperature inside is a constant 8°C throughout the year."
-    },
-    tours: {
-      title: "Your Adventure",
-      subtitle: "Experience Uvac and its meanders, visit the Ice Cave and enjoy one of the most beautiful views in Serbia. Cruises are available during the season from May 1 to October 31, with daily departures at 1:00 p.m. (except Mondays). Price: 2000 RSD per person — reservation is mandatory due to the limited number of places.",
-      t1Title: "Uvac Cruising — The Complete Experience",
-      t1Price: "2000 RSD",
-      t1Unit: "/pp*",
-      priceDisclaimer: "* Reserve entry and Ice Cave fee is charged separately (420 RSD) on-site.",
-      t1Duration: "4-5 Hours",
-      t1Max: "Max 12",
-      t1F1: "Cruise through the meanders",
-      t1F2: "Ice Cave visit",
-      t1F3: "Hiking to the viewpoint",
-      t1F4: "Griffon Vulture spotting",
-      selectDate: "Select Date"
-    },
-    reviews: {
-      title: "What Our Guests Say",
-      subtitle: "Join many satisfied travelers who have discovered the magic of Uvac with us.",
-      leaveReview: "Leave a review",
-      namePlaceholder: "Your name",
-      reviewPlaceholder: "Share your experience with us...",
-      submit: "Post review",
-      submitting: "Posting...",
-      success: "Thank you! Your review has been posted.",
-      error: "An error occurred."
-    },
-    location: {
-      title: "How to Reach Us",
-      subtitle: "Getting to the heart of the Uvac Nature Reserve is easier than you think. Your journey will take you through some of the most beautiful landscapes in Serbia—and the final destination is absolutely worth it.",
-      meetingPoint: "Cruise Departure Point",
-      meetingPointDesc: "All tours depart from the dam on Uvac Lake (Rastoke area), which is the official meeting point for cruises. There is free parking for vehicles at the departure point. We recommend arriving at least 15 minutes before departure.",
-      fromZlatibor: "From Nova Varoš",
-      fromZlatiborDesc: "At the very entrance to Nova Varoš, turn left and follow the road through the villages of Akmačići and Komarani (about 11.5 km) all the way to Uvac Lake.",
-      fromBelgrade: "From Belgrade / Novi Sad (3.5 - 4.5 hours)",
-      fromBelgradeDesc: "Follow the E763 highway (Miloš Veliki) towards Čačak and Požega, then continue on main road to Užice, Zlatibor and Nova Varoš. The route is well-marked.",
-      openMap: "Open in Google Maps",
-      callSupport: "Call for Support",
-      bookTour: "Book a Tour",
-      scenicRoute: "Adventure is here!"
-    },
-    cta: {
-      title: "Ready for the highlight of your Serbian trip?",
-      subtitle: "Spots are strictly limited to protect the natural habitat. Book in advance to secure your seat.",
-      btn: "Check Availability & Book Now",
-      cancel: "Cancellation possible up to 24 hours before departure via",
-      cancelLink: "My Bookings",
-      cancelSuffix: "."
-    },
-    footer: {
-      desc: "Uvac Griffon is a brand of the family company Euro Uvac from Nova Varoš, founded in 2021. We are dedicated to organizing cruises and promoting sustainable tourism in the ",
-      reserveLink: "Uvac Special Nature Reserve",
-      copyright: "Uvac Griffon © 2026",
-      organizer: "Cruise Organizer: Euro Uvac",
-      legal: "VAT (PIB): 112457556 | Reg. No. (MB): 66116204",
-      linksTitle: "Quick Links",
-      l1: "The Experience",
-      l2: "Tour",
-      l3: "Reviews",
-      l4: "How to Reach Us",
-      contactTitle: "Contact",
-      c1: "Nova Varoš, Serbia"
-    }
-  }
-};
-
-const ReviewSkeleton = () => (
-  <div className="py-20 bg-white">
-    <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-      {[1,2,3].map(i => (
-        <div key={i} className="bg-gray-100 rounded-2xl p-6 animate-pulse">
-          <div className="h-4 bg-gray-200 rounded mb-4 w-3/4"/>
-          <div className="h-4 bg-gray-200 rounded mb-2"/>
-          <div className="h-4 bg-gray-200 rounded w-1/2"/>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+// Specific Experience Spoke Pages
+const BeloglaviSup = lazy(() => import('./pages/experience/BeloglaviSup'));
+const KanjonUvca = lazy(() => import('./pages/experience/KanjonUvca'));
+const LedenaPecina = lazy(() => import('./pages/experience/LedenaPecina'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const ImageCreditsPage = lazy(() => import('./pages/ImageCreditsPage'));
 
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [lang, setLang] = useState<'sr' | 'en'>('sr');
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const location = useLocation();
 
+  // Handle scroll to hash on route change
+  useEffect(() => {
+    if (location.hash) {
+      setTimeout(() => {
+        let hashValue = location.hash.slice(1);
+        if (hashValue === 'tour' || hashValue === 'tura') {
+          hashValue = 'tour-section';
+        }
+        const element = document.getElementById(hashValue);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location]);
+
+  // Language persistent state
   useEffect(() => {
     const saved = localStorage.getItem('uvac-lang');
     if (saved === 'sr' || saved === 'en') setLang(saved);
   }, []);
 
-  const handleLangChange = (newLang: 'sr' | 'en') => {
-    setLang(newLang);
-    localStorage.setItem('uvac-lang', newLang);
-  };
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [isAdminRoute, setIsAdminRoute] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
+  // Synchronize document language attribute with language state (BCP 47 language code)
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  useEffect(() => {
-    // Check on mount
-    setIsAdminRoute(window.location.hash === '#admin');
-    
-    const handleHashChange = () => {
-      setIsAdminRoute(window.location.hash === '#admin');
-    };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-
-  const t = translations[lang];
-
-  useEffect(() => {
-    if (lang === 'en') {
-      document.title = 'Uvac River Cruise 2026 | Uvac Griffon – Meanders & Griffon Vultures';
-      document.querySelector('meta[name="description"]')
-        ?.setAttribute('content', 
-        'Boat cruise through Uvac River meanders from Rastoke Dam. Ice Cave, viewpoints and griffon vultures. Season May–October 2026. Book online!');
-    } else {
-      document.title = 'Krstarenje Uvcem 2026 | Uvac Griffon – Meandri i beloglavi supovi';
-      document.querySelector('meta[name="description"]')
-        ?.setAttribute('content', 
-        'Krstarenje meandrima Uvca brodom sa polaskom sa brane Rastoke. Ledena pećina, vidikovci, beloglavi supovi. Sezona 2026: maj–oktobar. Rezerviši odmah!');
-    }
+    document.documentElement.lang = lang;
   }, [lang]);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && videoRef.current) {
-            videoRef.current.play().catch(() => {
-              // Handle potential play failure (e.g. if browser blocks auto-play)
-            });
-          }
-        });
-      },
-      { threshold: 0.5 } // Play when 50% of the video is visible
-    );
-
-    if (videoRef.current) {
-      observer.observe(videoRef.current);
-    }
-
-    return () => {
-      if (videoRef.current) {
-        observer.unobserve(videoRef.current);
-      }
-    };
-  }, []);
-
+  // Scroll visibility logic
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -349,592 +69,41 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (isAdminRoute) {
-    return (
-      <Suspense fallback={<div className="h-screen flex items-center justify-center text-uvac-primary">Učitavanje...</div>}>
-        <AdminDashboard />
-      </Suspense>
-    );
-  }
+  const PageFallback = <div className="h-screen flex items-center justify-center text-primary font-serif italic">Učitavanje...</div>;
 
   return (
-    <div className="min-h-screen font-sans text-gray-800 overflow-x-hidden">
-      {/* Navigation */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <img 
-              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777665116/uvac-griffon.webp" 
-              alt="Uvac Griffon - Krstarenje Uvcem" 
-              className={`h-14 sm:h-16 w-auto object-contain transition-all duration-300 drop-shadow-md ${!isScrolled ? 'brightness-0 invert' : ''}`}
-            />
-          </div>
-          
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#about" className={`font-medium transition-colors hover:text-uvac-accent ${isScrolled ? 'text-gray-600' : 'text-white/90'}`}>{t.nav.experience}</a>
-            <a href="#tours" className={`font-medium transition-colors hover:text-uvac-accent ${isScrolled ? 'text-gray-600' : 'text-white/90'}`}>{t.nav.tours}</a>
-            <a href="#location" className={`font-medium transition-colors hover:text-uvac-accent ${isScrolled ? 'text-gray-600' : 'text-white/90'}`}>{t.nav.location}</a>
-            <a href="#reviews" className={`font-medium transition-colors hover:text-uvac-accent ${isScrolled ? 'text-gray-600' : 'text-white/90'}`}>{t.nav.reviews}</a>
+    <>
+      <Layout 
+        isScrolled={isScrolled} 
+        setIsScrolled={setIsScrolled}
+        lang={lang} 
+        setLang={setLang}
+        setIsBookingOpen={setIsBookingOpen}
+      >
+        <Suspense fallback={PageFallback}>
+          <Routes>
+            <Route path="/" element={<Home lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/iskustvo" element={<ExperiencePage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
             
-            <div className="flex items-center gap-4 border-l border-gray-300/30 pl-4">
-              <a 
-                href="https://www.facebook.com/p/Euro-Uvac-Krstarenje-meandrima-Uvca-100071051771543/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={`transition-colors flex items-center justify-center p-2 rounded-full ${isScrolled ? 'text-gray-500 hover:text-[#1877F2] hover:bg-gray-100' : 'text-white/90 hover:text-[#1877F2] hover:bg-white/10'}`}
-                aria-label="Facebook"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-
-              <a 
-                href="https://instagram.com/uvacgriffon_krstarenje" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={`transition-colors flex items-center justify-center p-2 rounded-full ${isScrolled ? 'text-gray-500 hover:text-[#E4405F] hover:bg-gray-100' : 'text-white/90 hover:text-[#E4405F] hover:bg-white/10'}`}
-                aria-label="Instagram"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-
-              <div className={`flex items-center gap-2 rounded-full p-1 ${isScrolled ? 'bg-gray-100' : 'bg-black/20 backdrop-blur-sm'}`}>
-                <button 
-                  onClick={() => handleLangChange('sr')}
-                  className={`px-3 py-1 rounded-full text-sm font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
-                >
-                  SR
-                </button>
-                <button 
-                  onClick={() => handleLangChange('en')}
-                  className={`px-3 py-1 rounded-full text-sm font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
-                >
-                  EN
-                </button>
-              </div>
-              
-              <button 
-                onClick={() => {
-                  window.location.hash = '#admin';
-                }}
-                className={`transition-colors font-medium flex items-center gap-2 ${isScrolled ? 'text-gray-500 hover:text-uvac-dark' : 'text-white/90 hover:text-white'}`}
-                title={t.nav.profileTitle}
-                aria-label={t.nav.profileTitle}
-              >
-                <User className="w-4 h-4" />
-                <span className="hidden lg:inline">{t.nav.myBookings}</span>
-              </button>
-
-              <button 
-                onClick={() => setIsBookingOpen(true)}
-                className="bg-uvac-accent hover:bg-[#c49363] text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                {t.nav.book}
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <div className="md:hidden flex items-center gap-4">
-            <div className={`flex items-center gap-1 rounded-full p-1.5 ${isScrolled ? 'bg-gray-100' : 'bg-black/20 backdrop-blur-sm'}`}>
-              <button 
-                onClick={() => handleLangChange('sr')}
-                className={`min-w-[32px] min-h-[32px] flex items-center justify-center rounded-full text-xs font-bold transition-all ${lang === 'sr' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
-              >
-                SR
-              </button>
-              <button 
-                onClick={() => handleLangChange('en')}
-                className={`min-w-[32px] min-h-[32px] flex items-center justify-center rounded-full text-xs font-bold transition-all ${lang === 'en' ? 'bg-white text-uvac-primary shadow-sm' : (isScrolled ? 'text-gray-500 hover:text-gray-800' : 'text-white hover:text-white/80')}`}
-              >
-                EN
-              </button>
-            </div>
-            <button 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 -mr-2"
-            >
-              {mobileMenuOpen ? (
-                <X className={`w-6 h-6 ${isScrolled ? 'text-gray-900' : 'text-white'}`} />
-              ) : (
-                <Menu className={`w-6 h-6 ${isScrolled ? 'text-gray-900' : 'text-white'}`} />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Nav */}
-        {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl py-4 flex flex-col items-center gap-4 transition-all duration-300 ease-in-out">
-            <a href="#about" className="text-gray-800 font-medium" onClick={() => setMobileMenuOpen(false)}>{t.nav.experience}</a>
-            <a href="#tours" className="text-gray-800 font-medium" onClick={() => setMobileMenuOpen(false)}>{t.nav.tours}</a>
-            <a href="#location" className="text-gray-800 font-medium" onClick={() => setMobileMenuOpen(false)}>{t.nav.location}</a>
-            <a href="#reviews" className="text-gray-800 font-medium" onClick={() => setMobileMenuOpen(false)}>{t.nav.reviews}</a>
-            <div className="w-11/12 h-px bg-gray-100 my-2"></div>
-            <div className="flex justify-center gap-6 w-full">
-              <a 
-                href="https://www.facebook.com/p/Euro-Uvac-Krstarenje-meandrima-Uvca-100071051771543/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-500 hover:text-[#1877F2] flex items-center justify-center p-2"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-6 h-6" />
-              </a>
-              <a 
-                href="https://instagram.com/uvacgriffon_krstarenje" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-500 hover:text-[#E4405F] flex items-center justify-center p-2"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-6 h-6" />
-              </a>
-              <button 
-                onClick={() => {
-                  window.location.hash = '#admin';
-                  setMobileMenuOpen(false);
-                }}
-                className="text-gray-500 hover:text-uvac-dark font-medium flex items-center gap-2 px-4 py-2"
-                title={t.nav.profileTitle}
-                aria-label={t.nav.profileTitle}
-              >
-                <User className="w-5 h-5" />
-                <span>{t.nav.myBookings}</span>
-              </button>
-            </div>
-            <button 
-              onClick={() => {
-                setIsBookingOpen(true);
-                setMobileMenuOpen(false);
-              }}
-              className="bg-uvac-accent hover:bg-[#c49363] text-white px-8 py-3 rounded-full font-bold w-11/12 transition-all shadow-md"
-            >
-              {t.nav.book}
-            </button>
-          </div>
-        )}
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-            <img 
-              src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1400/v1777665113/krstarenje-uvcem-meandri.webp" 
-              srcSet="
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_400/v1777665113/krstarenje-uvcem-meandri.webp 400w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_600/v1777665113/krstarenje-uvcem-meandri.webp 600w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1000/v1777665113/krstarenje-uvcem-meandri.webp 1000w,
-                https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1400/v1777665113/krstarenje-uvcem-meandri.webp 1400w
-              "
-              sizes="(max-width: 600px) 400px, 100vw"
-              referrerPolicy="no-referrer"
-              alt="Krstarenje meandrima reke Uvac - Uvac Griffon" 
-              className="w-full h-full object-cover"
-              fetchPriority="high"
-              loading="eager"
-              decoding="async"
-              onError={(e) => {
-                e.currentTarget.src = "https://images.unsplash.com/photo-1610408544955-46743b1740e7?q=80&w=2070&auto=format&fit=crop";
-              }}
-            />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
-        </div>
-        
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
-          <div>
-            <p className="inline-block py-1 px-3 rounded-full bg-black/20 text-white text-sm font-medium tracking-wider mb-6 border border-white/30">
-              {t.hero.badge}
-            </p>
-            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
-              {t.hero.title}
-            </h1>
-            <h2 className="text-3xl font-bold text-white mb-3">
-              {lang === 'sr' 
-                ? 'Krstarenje meandrima Uvca brodom' 
-                : 'Boat cruise through Uvac River meanders'}
-            </h2>
-            <p className="text-lg md:text-2xl text-white/90 mb-10 font-light max-w-2xl mx-auto">
-              {t.hero.subtitle}
-            </p>
+            {/* Experience Spoke Pages */}
+            <Route path="/iskustvo/beloglavi-sup" element={<BeloglaviSup lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/iskustvo/kanjon-uvca" element={<KanjonUvca lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/iskustvo/ledena-pecina" element={<LedenaPecina lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button 
-                onClick={() => setIsBookingOpen(true)}
-                className="bg-uvac-accent hover:bg-[#c49363] text-white px-6 py-3 rounded-full font-bold text-lg transition-all shadow-[0_0_20px_rgba(212,163,115,0.4)] hover:shadow-[0_0_30px_rgba(212,163,115,0.6)] transform hover:-translate-y-1 flex items-center gap-2 w-auto justify-center"
-              >
-                {t.hero.checkAvail} <ChevronRight className="w-5 h-5" />
-              </button>
-              <a href="#tours" className="bg-white/15 hover:bg-white/25 text-white border border-white/30 px-6 py-3 rounded-full font-bold text-lg transition-all w-auto justify-center text-center">
-                {t.hero.viewTours}
-              </a>
-            </div>
-          </div>
-        </div>
+            <Route path="/tura" element={<TourPage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/recenzije" element={<ReviewsPage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/privacy" element={<PrivacyPolicy lang={lang} />} />
+            <Route path="/image-credits" element={<ImageCreditsPage lang={lang} />} />
+            <Route path="/admin" element={
+              <Suspense fallback={<div className="h-screen flex items-center justify-center text-primary font-serif italic">Učitavanje...</div>}>
+                <AdminDashboard />
+              </Suspense>
+            } />
+            <Route path="*" element={<NotFound lang={lang} />} />
+          </Routes>
+        </Suspense>
+      </Layout>
 
-      </section>
-
-      {/* USP Section */}
-      <section id="about" className="py-20 bg-[#fafaf9]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-uvac-dark mb-4">{t.usp.title}</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg">{t.usp.subtitle}</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: t.usp.f1Title,
-                desc: t.usp.f1Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665121/beloglavi-sup.webp",
-                srcSet: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_400/v1777665121/beloglavi-sup.webp 400w, https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665121/beloglavi-sup.webp 700w"
-              },
-              {
-                title: t.usp.f2Title,
-                desc: t.usp.f2Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665114/vidikovac-ravni-krs-uvac.webp",
-                srcSet: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_400/v1777665114/vidikovac-ravni-krs-uvac.webp 400w, https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665114/vidikovac-ravni-krs-uvac.webp 700w"
-              },
-              {
-                title: t.usp.f3Title,
-                desc: t.usp.f3Desc,
-                image: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665120/ledena-pecina-uvac.webp",
-                srcSet: "https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_400/v1777665120/ledena-pecina-uvac.webp 400w, https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_700/v1777665120/ledena-pecina-uvac.webp 700w"
-              }
-            ].map((feature, idx) => (
-              <div 
-                key={idx}
-                className="group relative overflow-hidden rounded-2xl h-96 shadow-lg transform transition-all duration-300 hover:-translate-y-1.5 opacity-100"
-              >
-                <img 
-                  src={feature.image} 
-                  srcSet={feature.srcSet}
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  alt={idx === 0 ? "Beloglavi sup u letu iznad kanjona Uvca" : idx === 1 ? "Vidikovac Ravni Krš pogled na meandre Uvca" : "Ledeni ukrasi u Ledenoj pećini Uvac"} 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                
-                <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                  <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-white/80 leading-relaxed text-sm">{feature.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Tours Section */}
-      <section id="tours" className="py-20 bg-[#eef3f1]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-uvac-dark mb-4">{t.tours.title}</h2>
-            <p className="text-gray-600 text-lg">{t.tours.subtitle}</p>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            {/* Tour 1 */}
-            <div className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 flex flex-col sm:flex-row group">
-              <div className="sm:w-2/5 relative overflow-hidden bg-white h-64 sm:h-auto">
-                <div className="absolute inset-0 p-2 sm:p-4">
-                  <video 
-                    ref={videoRef}
-                    src="https://res.cloudinary.com/dejmpunhb/video/upload/f_auto,q_auto:eco,w_500/v1777655312/uvac-krstarenje.mp4" 
-                    muted 
-                    playsInline
-                    autoPlay 
-                    preload="none"
-                    className="w-full h-full object-contain rounded-[1.5rem] overflow-hidden transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-              </div>
-              <div className="p-4 sm:p-8 sm:w-3/5 flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-2xl font-serif font-bold text-uvac-dark">{t.tours.t1Title}</h3>
-                    <div className="text-right">
-                      <div className="text-uvac-primary font-bold text-xl">{t.tours.t1Price}</div>
-                      <div className="text-gray-500 text-xs">{t.tours.t1Unit}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
-                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {t.tours.t1Duration}</span>
-                    <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {t.tours.t1Max}</span>
-                  </div>
-                  <ul className="space-y-2 mb-4">
-                    {[t.tours.t1F1, t.tours.t1F2, t.tours.t1F3, t.tours.t1F4].map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-gray-700 text-sm">
-                        <CheckCircle2 className="w-5 h-5 text-uvac-accent shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="text-[10px] text-gray-400 italic mb-6 leading-tight">
-                    {t.tours.priceDisclaimer}
-                  </p>
-                </div>
-                <button 
-                  onClick={() => setIsBookingOpen(true)}
-                  className="w-full bg-uvac-primary hover:bg-uvac-light text-white py-3 rounded-xl font-bold transition-colors"
-                >
-                  {t.tours.selectDate}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How to Reach Us Section */}
-      <section id="location" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl font-serif font-bold text-uvac-dark mb-4">{t.location.title}</h2>
-            <p className="text-lg text-gray-600">{t.location.subtitle}</p>
-          </div>
-          
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Left Column: Directions */}
-            <div className="space-y-8">
-              {/* From Belgrade */}
-              <div className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-uvac-primary/10 p-2 rounded-lg">
-                    <Navigation className="w-6 h-6 text-uvac-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-uvac-dark">{t.location.fromBelgrade}</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  {t.location.fromBelgradeDesc}
-                </p>
-              </div>
-
-              {/* From Zlatibor */}
-              <div className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-uvac-primary/10 p-2 rounded-lg">
-                    <Car className="w-6 h-6 text-uvac-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-uvac-dark">{t.location.fromZlatibor}</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  {t.location.fromZlatiborDesc}
-                </p>
-              </div>
-
-              {/* Meeting Point */}
-              <div className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-uvac-primary/10 p-2 rounded-lg">
-                    <MapPin className="w-6 h-6 text-uvac-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-uvac-dark">{t.location.meetingPoint}</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  {t.location.meetingPointDesc}
-                </p>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <a 
-                  href="https://www.google.com/maps?q=43.41859265482159,19.926836899441174" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-uvac-dark px-6 py-4 rounded-xl font-bold transition-colors border border-gray-100 shadow-sm"
-                >
-                  <Map className="w-5 h-5" />
-                  {t.location.openMap}
-                </a>
-                <a 
-                  href="tel:+381658862760" 
-                  className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-uvac-dark px-6 py-4 rounded-xl font-bold transition-colors border border-gray-100 shadow-sm"
-                >
-                  <Phone className="w-5 h-5" />
-                  {t.location.callSupport}
-                </a>
-                <a 
-                  href="https://wa.me/381658862760" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-4 rounded-xl font-bold transition-colors shadow-sm"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  WhatsApp
-                </a>
-              </div>
-            </div>
-
-            {/* Right Column: Map and Photo */}
-            <div className="space-y-6">
-              {/* Google Map Embed */}
-              <div className="bg-white rounded-3xl overflow-hidden aspect-video border border-stone-200 relative shadow-inner">
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2898.018849082935!2d19.926278999999997!3d43.41843289999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4757efaea5130991%3A0x2b36bb83993b9c02!2sKrstarenje%20Euro%20Uvac!5e0!3m2!1ssr!2srs!4v1776958686675!5m2!1ssr!2srs" 
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  allowFullScreen={true} 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="absolute inset-0"
-                  title="Krstarenje Uvac Griffon - Google Maps"
-                ></iframe>
-              </div>
-              
-              {/* Photo of the road/dock - Placeholder for User's Upload */}
-              <div className="rounded-3xl overflow-hidden relative shadow-md aspect-video">
-                <img 
-                  src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_700/v1777665114/uvac-meandri.webp" 
-                  alt="Put do brane Rastoke i polazišta za krstarenje Uvcem" 
-                  className="w-full h-full object-cover block"
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
-                  <p className="text-white font-medium flex items-center gap-2 z-10">
-                    <MapPin className="w-4 h-4" />
-                    {t.location.scenicRoute}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Reviews Section */}
-      <ReviewSection 
-        t={t.reviews} 
-        lang={lang}
-      />
-
-      {/* Social Proof / CTA */}
-      <section className="py-24 bg-uvac-primary relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="topography" width="60" height="60" patternUnits="userSpaceOnUse">
-                <path d="M30 0c16.569 0 30 13.431 30 30S46.569 60 30 60 0 46.569 0 30 13.431 0 30 0zm0 2c15.464 0 28 12.536 28 28S45.464 58 30 58 2 45.464 2 30 14.536 2 30 2zm0 4c13.255 0 24 10.745 24 24S43.255 54 30 54 6 43.255 6 30 16.745 6 30 6zm0 4c11.046 0 20 8.954 20 20s-8.954 20-20 20S10 41.046 10 30 18.954 10 30 10zm0 4c8.837 0 16 7.163 16 16s-7.163 16-16 16S14 38.837 14 30 21.163 14 30 14z" fill="currentColor" fillRule="evenodd" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#topography)" />
-          </svg>
-        </div>
-        
-        <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6">{t.cta.title}</h2>
-          <p className="text-xl text-white/80 mb-10">{t.cta.subtitle}</p>
-          <button 
-            onClick={() => setIsBookingOpen(true)}
-            className="bg-uvac-accent hover:bg-[#c49363] text-white px-10 py-5 rounded-full font-bold text-xl transition-all shadow-xl transform hover:-translate-y-1"
-          >
-            {t.cta.btn}
-          </button>
-          <p className="text-white/60 text-sm mt-6">
-            {t.cta.cancel}{" "}
-            <button 
-              onClick={() => { window.location.hash = '#admin'; }}
-              className="underline hover:text-white transition-colors focus:outline-none"
-            >
-              {t.cta.cancelLink}
-            </button>
-            {t.cta.cancelSuffix}
-          </p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-uvac-dark text-white/70 py-12 border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <img 
-                src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:eco,w_220/v1777665116/uvac-griffon.webp" 
-                alt="Uvac Griffon" 
-                className="h-14 sm:h-16 w-auto object-contain brightness-0 invert" 
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <p className="max-w-sm mb-6">
-              {t.footer.desc}
-              <span className="underline">
-                {t.footer.reserveLink}
-              </span>.
-            </p>
-            <div className="flex gap-4">
-              <a 
-                href="https://www.facebook.com/p/Euro-Uvac-Krstarenje-meandrima-Uvca-100071051771543/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-[#1877F2] hover:bg-white/10 transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-6 h-6" />
-              </a>
-              <a 
-                href="https://instagram.com/uvacgriffon_krstarenje" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-[#E4405F] hover:bg-white/10 transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-6 h-6" />
-              </a>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-white font-bold mb-4">{t.footer.linksTitle}</h4>
-            <ul className="space-y-2">
-              <li><a href="#about" className="hover:text-white transition-colors">{t.footer.l1}</a></li>
-              <li><a href="#tours" className="hover:text-white transition-colors">{t.footer.l2}</a></li>
-              <li><a href="#location" className="hover:text-white transition-colors">{t.footer.l4}</a></li>
-              <li><a href="#reviews" className="hover:text-white transition-colors">{t.footer.l3}</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-bold mb-4">{t.footer.contactTitle}</h4>
-            <ul className="space-y-3">
-              <li><a href="mailto:milivoje.ciro@gmail.com" className="hover:text-white transition-colors">milivoje.ciro@gmail.com</a></li>
-              <li className="flex items-center gap-3">
-                <a href="tel:+381658862760" className="hover:text-white transition-colors">+381 65 886 2760</a>
-                <a 
-                  href="https://wa.me/381658862760" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-[#25D366] hover:bg-[#20bd5a] text-white p-1 rounded-full transition-colors flex items-center justify-center"
-                  title="WhatsApp"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                </a>
-              </li>
-              <li className="text-gray-400">{t.footer.c1}</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-white/10 text-center text-sm text-gray-400">
-          <p className="mb-1 font-medium text-gray-300">
-            {t.footer.copyright}
-          </p>
-          <a 
-            href="/privacy"
-            className="text-gray-400 hover:text-white underline text-sm transition-colors block mb-1"
-          >
-            {lang === 'sr' ? 'Politika privatnosti' : 'Privacy Policy'}
-          </a>
-          <p className="mb-1">{t.footer.organizer}</p>
-          <p>{t.footer.legal}</p>
-        </div>
-      </footer>
       <Suspense fallback={null}>
         <BookingModal 
           isOpen={isBookingOpen} 
@@ -942,6 +111,6 @@ export default function App() {
           lang={lang} 
         />
       </Suspense>
-    </div>
+    </>
   );
 }

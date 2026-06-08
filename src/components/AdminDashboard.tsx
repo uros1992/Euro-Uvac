@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, onSnapshot, updateDoc, doc, setDoc, getDoc, where, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth, signInWithGoogle } from '../firebase';
+import { supabase } from '../supabase';
 import { LogOut, Trash2, CheckCircle2, User, Mail, Phone, Users, Search, ArrowLeft } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -10,9 +11,50 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let activeChannel: any = null;
+
+    const fetchReservations = async (u: any, isAdm: boolean) => {
+      try {
+        let queryBuilder = supabase.from('bookings').select('*');
+        if (!isAdm) {
+          if (u.email) {
+            queryBuilder = queryBuilder.ilike('email', u.email);
+          } else {
+            queryBuilder = queryBuilder.eq('email', 'null');
+          }
+        }
+
+        const { data, error } = await queryBuilder;
+        if (error) {
+          console.error("Error fetching bookings from Supabase:", error);
+          setReservations([]);
+        } else if (data) {
+          const mapped = data.map((b: any) => ({
+            id: String(b.id),
+            date: b.booking_date,
+            createdAt: b.created_at,
+            name: b.name,
+            email: b.email,
+            phone: b.phone,
+            seats: Array(parseInt(b.guest_count) || 0).fill(''),
+            status: 'confirmed',
+            message: b.message
+          }));
+
+          mapped.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          setReservations(mapped);
+        }
+      } catch (err) {
+        console.error("Fetch reservations error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     const unsubscribe = auth.onAuthStateChanged(async (u) => {
       setUser(u);
-        if (u) {
+      if (u) {
+        setLoading(true);
         let isAdm = false;
         const userEmail = u.email?.toLowerCase();
         try {
@@ -27,42 +69,31 @@ export default function AdminDashboard() {
         } catch(e) {}
         setIsAdmin(isAdm);
         
-        let q;
-        if (isAdm) {
-          q = query(collection(db, 'reservations'));
-        } else {
-          q = query(collection(db, 'reservations'), where('userId', '==', u.uid));
-        }
+        await fetchReservations(u, isAdm);
 
-        const unsubRes = onSnapshot(q, async (snapshot) => {
-          const res = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          res.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-          
-          // Fetch PII in parallel
-          const resWithPii = await Promise.all(res.map(async (r: any) => {
-            let pii = {};
-            if (isAdm || r.userId === u.uid) {
-              try {
-                 const piiDoc = await getDoc(doc(db, `reservations/${r.id}/details/info`));
-                 if (piiDoc.exists()) pii = piiDoc.data();
-              } catch(e) {}
+        // Subscribe to real-time table modifications
+        activeChannel = supabase
+          .channel('schema-db-changes')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'bookings' },
+            () => {
+              fetchReservations(u, isAdm);
             }
-            return { ...r, ...pii };
-          }));
-          
-          setReservations(resWithPii);
-          setLoading(false);
-        }, (err) => {
-          console.error("Firestore snapshot error:", err);
-          setLoading(false);
-        });
-        return () => unsubRes();
+          )
+          .subscribe();
       } else {
+        setReservations([]);
         setLoading(false);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (activeChannel) {
+        supabase.removeChannel(activeChannel);
+      }
+    };
   }, []);
 
   const handleSignIn = async () => {
@@ -76,27 +107,22 @@ export default function AdminDashboard() {
   const handleCancel = async (id: string) => {
     // window.confirm is blocked inside the AI Studio iframe, so we remove it.
     try {
-      if (isAdmin) {
-        // Admin deletes entirely from DB
-        await deleteDoc(doc(db, `reservations/${id}/details/info`));
-        await deleteDoc(doc(db, 'reservations', id));
-      } else {
-        // Normal user cancels
-        await updateDoc(doc(db, 'reservations', id), { status: 'cancelled' });
+      // Deletes completely from Supabase bookings table to represent cancellation/freeing up seats
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw error;
       }
     } catch (err) {
       console.error("Cancel error:", err);
-      // alert is also often blocked in iframes, so we will use console.error
     }
   };
 
   const handleRestore = async (id: string) => {
-      try {
-        await updateDoc(doc(db, 'reservations', id), { status: 'confirmed' });
-      } catch (err) {
-        console.error("Restore error:", err);
-        alert("Failed to restore reservation.");
-      }
+    console.log("Restore not applicable for deleted database record:", id);
   };
 
   const getTourTime = (dateStr: string) => {
@@ -114,13 +140,13 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-6 relative">
         <div className="absolute top-6 left-6 md:top-12 md:left-12">
           <button 
-            onClick={() => window.location.hash = ''} 
+            onClick={() => window.location.href = '/'} 
             className="flex items-center gap-2 text-gray-500 hover:text-uvac-dark font-medium transition-colors"
           >
             <ArrowLeft className="w-5 h-5" /> Back to Site
           </button>
         </div>
-        <div className="bg-white p-10 rounded-2xl shadow-xl max-w-sm w-full text-center">
+        <div className="bg-white p-10 rounded-xl shadow-xl max-w-sm w-full text-center">
           <h2 className="text-2xl font-serif font-bold mb-6">User / Admin Access</h2>
           <button 
             onClick={handleSignIn}
@@ -138,13 +164,13 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto space-y-8">
         <div>
           <button 
-            onClick={() => window.location.hash = ''} 
+            onClick={() => window.location.href = '/'} 
             className="flex items-center gap-2 text-gray-500 hover:text-uvac-dark font-medium transition-colors"
           >
             <ArrowLeft className="w-5 h-5" /> Back to Site
           </button>
         </div>
-        <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+        <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-stone-100">
           <div>
             <h1 className="text-3xl font-serif font-bold text-uvac-dark">{isAdmin ? "Admin Dashboard" : "My Bookings"}</h1>
             <p className="text-gray-500">{isAdmin ? "Manage all reservations." : "Manage your reservations."}</p>
@@ -157,7 +183,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-stone-100 overflow-hidden">
           <div className="overflow-x-auto w-full">
             <table className="w-full text-left border-collapse min-w-[600px]">
               <thead>
@@ -187,7 +213,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="p-4 align-top text-gray-800 font-bold flex items-center gap-2">
                       <Users className="w-4 h-4 text-uvac-primary" />
-                      {res.seats.length} guests
+                      {(res.seats?.length || 0)} guests
                     </td>
                     <td className="p-4 align-top">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${res.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>

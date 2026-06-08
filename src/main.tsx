@@ -1,27 +1,22 @@
-import { StrictMode, lazy, Suspense } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx';
 import './index.css';
-import { ReviewsProvider } from './context/ReviewsContext';
-
-const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+import { ReviewsProvider } from './ReviewsContext';
+import ErrorBoundary from './ErrorBoundary.tsx';
 
 createRoot(document.getElementById('root')!).render(
-  <BrowserRouter>
-    <ReviewsProvider>
-      <Routes>
-        <Route path="/privacy" element={
-          <Suspense fallback={
-            <div className="h-screen flex items-center justify-center text-uvac-primary">
-              Učitavanje...
-            </div>
-          }>
-            <PrivacyPolicy />
-          </Suspense>
-        } />
-        <Route path="*" element={<App />} />
-      </Routes>
-    </ReviewsProvider>
-  </BrowserRouter>
+  <StrictMode>
+    <ErrorBoundary>
+      <HelmetProvider>
+        <BrowserRouter>
+          <ReviewsProvider>
+            <App />
+          </ReviewsProvider>
+        </BrowserRouter>
+      </HelmetProvider>
+    </ErrorBoundary>
+  </StrictMode>
 );

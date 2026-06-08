@@ -15,6 +15,7 @@ interface Review {
   rating: number;
   dateSr?: string;
   dateEn?: string;
+  isoDate?: string;
 }
 
 interface ReviewsContextType {
@@ -39,7 +40,8 @@ const formatDate = (timestamp: any) => {
     'September','October','November','December'];
   return {
     sr: `${monthsSR[date.getMonth()]} ${date.getFullYear()}.`,
-    en: `${monthsEN[date.getMonth()]} ${date.getFullYear()}`
+    en: `${monthsEN[date.getMonth()]} ${date.getFullYear()}`,
+    iso: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
   };
 };
 
@@ -68,7 +70,8 @@ export function ReviewsProvider({
           text: data.text,
           rating: data.rating,
           dateSr: d.sr,
-          dateEn: d.en
+          dateEn: d.en,
+          isoDate: d.iso
         });
       });
       setReviews(fetched);
