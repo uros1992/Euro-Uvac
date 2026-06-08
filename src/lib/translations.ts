@@ -90,7 +90,7 @@ export const translations = {
     hero: {
       badge: "SERBIA'S NATURAL WONDER",
       title: "Experience the Untouched Beauty of Uvac",
-      subtitle: "Cruise through majestic meanders of Uvac, explore hidden Ice Cave, and witness the flight of the rare Griffon Vulture. Season May–October 2026 | Departures every day at 13:00, except Monday.",
+      subtitle: "Cruise through majestic meanders of Uvac, explore hidden Ice Cave, and witness the flight of the rare Griffon Vulture. Season May–October 2026 | Departures every day at 1:00 p.m., except Monday.",
       checkAvail: "Check Availability",
       viewTours: "View Tour Option"
     },
