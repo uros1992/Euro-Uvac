@@ -87,6 +87,26 @@ async function startServer() {
     next();
   });
 
+  // Secure endpoint to fetch booking dates and seat count without exposing private customer information
+  app.get("/api/availability", async (req, res) => {
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('booking_date, guest_count');
+
+      if (error) {
+        console.error("Error fetching availability:", error);
+        return res.status(500).json({ success: false, error: "Database error fetching availability" });
+      }
+
+      res.status(200).json({ success: true, availability: data });
+    } catch (err: any) {
+      console.error("Availability exception:", err);
+      res.status(500).json({ success: false, error: err.message || "Internal server error" });
+    }
+  });
+
   // NEW: Booking endpoint with Supabase storage and Resend notification
   app.post("/api/booking", async (req, res) => {
     try {

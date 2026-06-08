@@ -186,23 +186,25 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
     return () => unsub();
   }, []);
 
-  // Fetch all confirmed reservations from Supabase to compute availability
+  // Fetch all confirmed reservations from API (secure backend proxy bypassing client RLS / GDPR compliant) to compute availability
   useEffect(() => {
     const fetchBookings = async () => {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*');
-      
-      if (data) {
-        // Map Supabase fields to the shape used in useMemo logic
-        const mapped = data.map(b => ({
-          date: b.booking_date,
-          seatsCount: b.guest_count,
-          status: 'confirmed'
-        }));
-        setReservations(mapped);
-      } else if (error) {
-        console.error('Error fetching occupied dates from Supabase:', error);
+      try {
+        const response = await fetch('/api/availability');
+        const result = await response.json();
+        if (result.success && result.availability) {
+          // Map availability fields to the shape used in useMemo logic
+          const mapped = result.availability.map((b: any) => ({
+            date: b.booking_date,
+            seatsCount: b.guest_count,
+            status: 'confirmed'
+          }));
+          setReservations(mapped);
+        } else {
+          console.error('Error fetching occupied dates from API:', result.error);
+        }
+      } catch (err) {
+        console.error('Network error fetching occupied dates:', err);
       }
     };
 
@@ -276,7 +278,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
       
       const dayIso = new Date(Date.UTC(year, month, i)).toISOString().split('T')[0];
       const dayBookings = reservations.filter(r => r.date.startsWith(dayIso));
-      const bookedSeatsCount = dayBookings.reduce((sum, r) => sum + (r.seatsCount || r.seats?.length || 0), 0);
+      const bookedSeatsCount = dayBookings.reduce((sum, r) => sum + (Number(r.seatsCount) || r.seats?.length || 0), 0);
       
       if (currentDate < today) {
         map[i] = 0; // Past days
