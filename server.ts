@@ -589,8 +589,13 @@ async function startServer() {
   } else {
     // Production serving
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, {
+      maxAge: '1y',      // JS/CSS files with hashes — aggressive caching
+      etag: false,       // hashes under build format are better than etags
+      immutable: true,   // indicates to browser that resources never need validation
+    }));
     app.get('*', (req, res) => {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
