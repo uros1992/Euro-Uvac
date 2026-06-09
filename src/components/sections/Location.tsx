@@ -57,7 +57,7 @@ export default function Location({ lang }: LocationProps) {
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <a 
-                href="https://www.google.com/maps?q=43.41859265482159,19.926836899441174" 
+                href="https://www.google.com/maps/place/?q=place_id:ChIJkQkTpa7vV0cRApw7mYO7Nis" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-uvac-dark px-6 py-4 rounded-xl font-bold transition-colors border border-gray-100 shadow-sm"
