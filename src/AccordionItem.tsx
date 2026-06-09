@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 
 interface AccordionItemProps {
@@ -43,22 +42,21 @@ export default function AccordionItem({
         </div>
       </button>
 
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            id={`accordion-panel-${index}`}
-            initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-            animate={reduceMotion ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
-            exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            <div className="px-6 pb-6 text-gray-600 leading-relaxed max-w-3xl text-sm md:text-base border-t border-gray-100/50 pt-4">
-              {answer}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div
+        id={`accordion-panel-${index}`}
+        className="overflow-hidden"
+        style={{
+          maxHeight: isOpen ? '650px' : '0px',
+          opacity: isOpen ? 1 : 0,
+          transition: reduceMotion 
+            ? 'opacity 0.2s ease' 
+            : 'max-height 0.3s ease-in-out, opacity 0.25s ease-in-out',
+        }}
+      >
+        <div className="px-6 pb-6 text-gray-600 leading-relaxed max-w-3xl text-sm md:text-base border-t border-gray-100/50 pt-4">
+          {answer}
+        </div>
+      </div>
     </div>
   );
 }
