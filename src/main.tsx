@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx';
 import './index.css';
-import { ReviewsProvider } from './ReviewsContext';
 import ErrorBoundary from './ErrorBoundary.tsx';
 
 createRoot(document.getElementById('root')!).render(
@@ -12,9 +11,7 @@ createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
       <HelmetProvider>
         <BrowserRouter>
-          <ReviewsProvider>
-            <App />
-          </ReviewsProvider>
+          <App />
         </BrowserRouter>
       </HelmetProvider>
     </ErrorBoundary>

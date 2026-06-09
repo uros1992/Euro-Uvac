@@ -2,6 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import { ReviewsProvider } from './ReviewsContext';
 
 // Lazy load components
 const BookingModal = lazy(() => import('./components/BookingModal'));
@@ -82,7 +83,11 @@ export default function App() {
       >
         <Suspense fallback={PageFallback}>
           <Routes>
-            <Route path="/" element={<Home lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/" element={
+              <ReviewsProvider>
+                <Home lang={lang} setIsBookingOpen={setIsBookingOpen} />
+              </ReviewsProvider>
+            } />
             <Route path="/iskustvo" element={<ExperiencePage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
             
             {/* Experience Spoke Pages */}
@@ -91,7 +96,11 @@ export default function App() {
             <Route path="/ledena-pecina" element={<LedenaPecina lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
             
             <Route path="/tura" element={<TourPage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
-            <Route path="/recenzije" element={<ReviewsPage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
+            <Route path="/recenzije" element={
+              <ReviewsProvider>
+                <ReviewsPage lang={lang} setIsBookingOpen={setIsBookingOpen} />
+              </ReviewsProvider>
+            } />
             <Route path="/privacy" element={<PrivacyPolicy lang={lang} />} />
             <Route path="/image-credits" element={<ImageCreditsPage lang={lang} />} />
             <Route path="/admin" element={
