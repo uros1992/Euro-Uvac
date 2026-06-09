@@ -7,6 +7,19 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react(), tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
+            'motion': ['motion'],
+            'leaflet': ['leaflet', 'react-leaflet'],
+            'supabase': ['@supabase/supabase-js'],
+            'vendor': ['react', 'react-dom', 'react-router-dom'],
+          }
+        }
+      }
+    },
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
