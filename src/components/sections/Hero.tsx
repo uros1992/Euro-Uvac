@@ -11,7 +11,7 @@ export default function Hero({ lang, setIsBookingOpen }: HeroProps) {
   const t = translations[lang];
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative h-[100svh] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
           <img 
             src="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1400/v1777665113/krstarenje-uvcem-meandri.webp" 

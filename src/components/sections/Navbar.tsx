@@ -82,6 +82,18 @@ export default function Navbar({ isScrolled, lang, setLang, setIsBookingOpen }: 
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Toggle body scroll lock when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled || !isHeroPage ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">

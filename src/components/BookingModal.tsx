@@ -579,7 +579,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                       type="text" 
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-uvac-primary focus:border-transparent outline-none transition-all"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-uvac-primary focus:border-transparent outline-none transition-all text-base"
                       placeholder="John Doe"
                     />
                   </div>
@@ -589,7 +589,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                       type="email" 
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-uvac-primary focus:border-transparent outline-none transition-all"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-uvac-primary focus:border-transparent outline-none transition-all text-base"
                       placeholder="john@example.com"
                     />
                   </div>
@@ -599,7 +599,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                       type="tel" 
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-uvac-primary focus:border-transparent outline-none transition-all"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-uvac-primary focus:border-transparent outline-none transition-all text-base"
                       placeholder="+381 60 123 4567"
                     />
                   </div>
