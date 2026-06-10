@@ -4,20 +4,48 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import { ReviewsProvider } from './ReviewsContext';
 
+// Helper function to retry lazy loading chunks when a new deployment renders them obsolete
+function lazyWithRetry<T extends React.ComponentType<any>>(
+  importFn: () => Promise<{ default: T }>
+): React.LazyExoticComponent<T> {
+  return lazy(() =>
+    importFn().catch((error) => {
+      const errorMsg = error?.message || '';
+      const isChunkError = 
+        errorMsg.includes('Failed to fetch') ||
+        errorMsg.includes('ChunkLoadError') ||
+        errorMsg.includes('Loading chunk') ||
+        errorMsg.includes('dynamically imported module') ||
+        errorMsg.includes('error loading');
+      
+      if (isChunkError) {
+        const lastReload = sessionStorage.getItem('chunk_error_reload');
+        const timeNow = Date.now();
+        if (!lastReload || timeNow - parseInt(lastReload, 10) > 10000) {
+          sessionStorage.setItem('chunk_error_reload', timeNow.toString());
+          window.location.reload();
+          return new Promise(() => {}); // Return a pending promise to prevent rendering broken state before reload
+        }
+      }
+      throw error;
+    })
+  );
+}
+
 // Lazy load components
-const BookingModal = lazy(() => import('./components/BookingModal'));
-const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
-const TourPage = lazy(() => import('./pages/TourPage'));
-const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const ExperiencePage = lazy(() => import('./pages/ExperiencePage'));
+const BookingModal = lazyWithRetry(() => import('./components/BookingModal'));
+const AdminDashboard = lazyWithRetry(() => import('./components/AdminDashboard'));
+const TourPage = lazyWithRetry(() => import('./pages/TourPage'));
+const ReviewsPage = lazyWithRetry(() => import('./pages/ReviewsPage'));
+const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
+const ExperiencePage = lazyWithRetry(() => import('./pages/ExperiencePage'));
 
 // Specific Experience Spoke Pages
-const BeloglaviSup = lazy(() => import('./pages/BeloglaviSup'));
-const KanjonUvca = lazy(() => import('./pages/KanjonUvca'));
-const LedenaPecina = lazy(() => import('./pages/LedenaPecina'));
-const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
-const ImageCreditsPage = lazy(() => import('./pages/ImageCreditsPage'));
+const BeloglaviSup = lazyWithRetry(() => import('./pages/BeloglaviSup'));
+const KanjonUvca = lazyWithRetry(() => import('./pages/KanjonUvca'));
+const LedenaPecina = lazyWithRetry(() => import('./pages/LedenaPecina'));
+const PrivacyPolicy = lazyWithRetry(() => import('./pages/PrivacyPolicy'));
+const ImageCreditsPage = lazyWithRetry(() => import('./pages/ImageCreditsPage'));
 
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);

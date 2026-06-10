@@ -22,6 +22,26 @@ export default class ErrorBoundary extends React.Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Uncaught error inside ErrorBoundary:", error, errorInfo);
+    
+    // Check if it's a chunk/loading dynamic import failure
+    const errorMsg = error?.message || '';
+    const isChunkError = 
+      errorMsg.includes('ChunkLoadError') || 
+      error?.name === 'ChunkLoadError' ||
+      errorMsg.includes('Failed to fetch dynamically imported module') ||
+      errorMsg.includes('Loading chunk') ||
+      errorMsg.includes('error loading') ||
+      errorMsg.includes('Unexpected token') || // Unexpected token '<' is often HTML instead of JS chunk
+      errorMsg.includes('expected expression, got'); // Firefox equivalent
+
+    if (isChunkError) {
+      const lastReload = sessionStorage.getItem('chunk_error_reload');
+      const timeNow = Date.now();
+      if (!lastReload || timeNow - parseInt(lastReload, 10) > 10000) {
+        sessionStorage.setItem('chunk_error_reload', timeNow.toString());
+        window.location.reload();
+      }
+    }
   }
 
   private handleReload = () => {
