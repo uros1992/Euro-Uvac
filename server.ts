@@ -594,31 +594,9 @@ async function startServer() {
       etag: false,       // hashes under build format are better than etags
       immutable: true,   // indicates to browser that resources never need validation
     }));
-    const validRoutes = new Set([
-      '/',
-      '/beloglavi-sup',
-      '/kanjon-uvca',
-      '/ledena-pecina',
-      '/tura',
-      '/recenzije',
-      '/privacy',
-      '/image-credits',
-      '/admin'
-    ]);
-
     app.get('*', (req, res) => {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      
-      let normalizedPath = req.path;
-      if (normalizedPath.endsWith('/') && normalizedPath.length > 1) {
-        normalizedPath = normalizedPath.slice(0, -1);
-      }
-
-      if (validRoutes.has(normalizedPath)) {
-        res.sendFile(path.join(distPath, 'index.html'));
-      } else {
-        res.status(404).sendFile(path.join(distPath, 'index.html'));
-      }
+      res.sendFile(path.join(distPath, 'index.html'));
     });
   }
   
