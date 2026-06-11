@@ -495,7 +495,7 @@ export default function TourPage({ lang, setIsBookingOpen }: TourPageProps) {
 
           <div className="relative">
             {/* Vertical Line */}
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gray-100 -translate-x-1/2" />
+            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-uvac-primary/10 -translate-x-1/2" />
 
             <div className="space-y-12">
               {timeline.map((item, i) => (
