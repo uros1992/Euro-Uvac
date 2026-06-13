@@ -8,7 +8,7 @@ const content = {
     sections: [
       {
         title: "1. Ko prikuplja podatke",
-        text: "Euro Uvac\nAkmačići, Nova Varoš, Srbija\nPIB: 112457556\nMatični broj: 66116204\nEmail: [booking@uvacgriffon.rs]\nTelefon: +381 65 886 2760"
+        text: "Euro Uvac\nAkmačići, Nova Varoš, Srbija\nPIB: 112457556\nMatični broj: 66116204\nEmail: booking@uvacgriffon.rs\nTelefon: +381 65 886 2760"
       },
       {
         title: "2. Koje podatke prikupljamo",
@@ -40,7 +40,7 @@ const content = {
       },
       {
         title: "9. Kontakt",
-        text: "Euro Uvac\nEmail: [booking@uvacgriffon.rs]\nTelefon: +381 65 886 2760"
+        text: "Euro Uvac\nEmail: booking@uvacgriffon.rs\nTelefon: +381 65 886 2760"
       }
     ]
   },
@@ -50,7 +50,7 @@ const content = {
     sections: [
       {
         title: "1. Data Controller",
-        text: "Euro Uvac\nAkmačići, Nova Varoš, Serbia\nVAT (PIB): 112457556\nReg. No. (MB): 66116204\nEmail: [booking@uvacgriffon.rs]\nPhone: +381 65 886 2760"
+        text: "Euro Uvac\nAkmačići, Nova Varoš, Serbia\nVAT (PIB): 112457556\nReg. No. (MB): 66116204\nEmail: booking@uvacgriffon.rs\nPhone: +381 65 886 2760"
       },
       {
         title: "2. Data We Collect",
@@ -82,7 +82,7 @@ const content = {
       },
       {
         title: "9. Contact",
-        text: "Euro Uvac\nEmail: [booking@uvacgriffon.rs]\nPhone: +381 65 886 2760"
+        text: "Euro Uvac\nEmail: booking@uvacgriffon.rs\nPhone: +381 65 886 2760"
       }
     ]
   }

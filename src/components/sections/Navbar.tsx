@@ -29,7 +29,6 @@ export default function Navbar({ isScrolled, lang, setLang, setIsBookingOpen }: 
   // List of routes that start with a full-screen hero image and should have a transparent navbar at the top
   const heroRoutes = [
     '/', 
-    '/iskustvo', 
     '/beloglavi-sup', 
     '/kanjon-uvca', 
     '/ledena-pecina',
@@ -116,7 +115,7 @@ export default function Navbar({ isScrolled, lang, setLang, setIsBookingOpen }: 
           >
             <div className="flex items-center gap-1 cursor-pointer">
               <Link 
-                to="/#iskustvo"
+                to="/#otkrijte-uvac"
                 className={`font-medium transition-colors hover:text-uvac-accent ${isScrolled || !isHeroPage ? 'text-gray-600' : 'text-white/90'}`}
               >
                 {t.nav.experience}
@@ -284,7 +283,7 @@ export default function Navbar({ isScrolled, lang, setLang, setIsBookingOpen }: 
             </button>
             <div className={`w-full bg-gray-50 flex flex-col items-center overflow-hidden transition-all duration-300 ${isExpAccordionOpen ? 'max-h-60 py-2' : 'max-h-0'}`}>
               <Link 
-                to="/#iskustvo" 
+                to="/#otkrijte-uvac" 
                 className="min-h-[44px] flex items-center justify-center w-full py-2 text-gray-600 text-sm hover:bg-gray-100/50"
                 onClick={() => {
                   setMobileMenuOpen(false);

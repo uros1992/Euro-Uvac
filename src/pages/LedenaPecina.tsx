@@ -91,7 +91,7 @@ const LedenaPecina = ({ lang, setIsBookingOpen }: LedenaPecinaProps) => {
         backgroundImage="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1200/v1777665120/ledena-pecina-uvac.webp"
         breadcrumbs={[
           { label: lang === 'sr' ? 'Početna' : 'Home', path: '/' },
-          { label: lang === 'sr' ? 'Otkrijte Uvac' : 'Discover Uvac', path: '/#iskustvo' },
+          { label: lang === 'sr' ? 'Otkrijte Uvac' : 'Discover Uvac', path: '/#otkrijte-uvac' },
           { label: lang === 'sr' ? 'Ledena pećina' : 'Ice Cave' }
         ]}
         lang={lang}

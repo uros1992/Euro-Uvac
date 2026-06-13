@@ -35,7 +35,7 @@ export default function Experience({ lang }: ExperienceProps) {
   ];
 
   return (
-    <section id="iskustvo" className="py-20 bg-surface-page">
+    <section id="otkrijte-uvac" className="py-20 bg-surface-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-serif font-bold text-uvac-dark mb-4">{t.usp.title}</h2>

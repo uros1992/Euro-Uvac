@@ -10,7 +10,6 @@ const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const TourPage = lazy(() => import('./pages/TourPage'));
 const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-const ExperiencePage = lazy(() => import('./pages/ExperiencePage'));
 
 // Specific Experience Spoke Pages
 const BeloglaviSup = lazy(() => import('./pages/BeloglaviSup'));
@@ -88,7 +87,6 @@ export default function App() {
                 <Home lang={lang} setIsBookingOpen={setIsBookingOpen} />
               </ReviewsProvider>
             } />
-            <Route path="/iskustvo" element={<ExperiencePage lang={lang} setIsBookingOpen={setIsBookingOpen} />} />
             
             {/* Experience Spoke Pages */}
             <Route path="/beloglavi-sup" element={<BeloglaviSup lang={lang} setIsBookingOpen={setIsBookingOpen} />} />

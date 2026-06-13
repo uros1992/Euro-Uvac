@@ -78,7 +78,7 @@ const KanjonUvca = ({ lang, setIsBookingOpen }: KanjonUvcaProps) => {
             "@type": "ListItem",
             "position": 2,
             "name": lang === 'sr' ? "Otkrijte Uvac" : "Discover Uvac",
-            "item": "https://uvacgriffon.rs/iskustvo"
+            "item": "https://uvacgriffon.rs/#otkrijte-uvac"
           },
           {
             "@type": "ListItem",
@@ -107,7 +107,7 @@ const KanjonUvca = ({ lang, setIsBookingOpen }: KanjonUvcaProps) => {
         backgroundImage="https://res.cloudinary.com/dejmpunhb/image/upload/f_auto,q_auto:good,w_1200/v1777665114/vidikovac-ravni-krs-uvac.webp"
         breadcrumbs={[
           { label: lang === 'sr' ? 'Početna' : 'Home', path: '/' },
-          { label: lang === 'sr' ? 'Otkrijte Uvac' : 'Discover Uvac', path: '/#iskustvo' },
+          { label: lang === 'sr' ? 'Otkrijte Uvac' : 'Discover Uvac', path: '/#otkrijte-uvac' },
           { label: lang === 'sr' ? 'Kanjon Uvca' : 'Uvac Canyon' }
         ]}
         lang={lang}

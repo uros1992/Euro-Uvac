@@ -53,7 +53,7 @@ export default function Footer({ lang }: FooterProps) {
         <div>
           <h4 className="text-white font-bold mb-4">{t.footer.linksTitle}</h4>
           <ul className="space-y-2">
-            <li><Link to="/#iskustvo" className="hover:text-white transition-colors">{t.footer.l1}</Link></li>
+            <li><Link to="/#otkrijte-uvac" className="hover:text-white transition-colors">{t.footer.l1}</Link></li>
             <li><Link to={lang === 'en' ? '/#tour' : '/#tura'} className="hover:text-white transition-colors">{t.footer.l2}</Link></li>
             <li><Link to="/#location" className="hover:text-white transition-colors">{t.footer.l4}</Link></li>
             <li><Link to="/recenzije" className="hover:text-white transition-colors">{t.footer.l3}</Link></li>
@@ -63,7 +63,7 @@ export default function Footer({ lang }: FooterProps) {
         <div>
           <h4 className="text-white font-bold mb-4">{t.footer.contactTitle}</h4>
           <ul className="space-y-3">
-            <li><a href="mailto:milivoje.ciro@gmail.com" className="hover:text-white transition-colors">milivoje.ciro@gmail.com</a></li>
+            <li><a href="mailto:booking@uvacgriffon.rs" className="hover:text-white transition-colors">booking@uvacgriffon.rs</a></li>
             <li className="flex items-center gap-3">
               <a href="tel:+381658862760" className="hover:text-white transition-colors">+381 65 886 2760</a>
               <a 
