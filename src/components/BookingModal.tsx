@@ -171,6 +171,7 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reservations, setReservations] = useState<any[]>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged(u => {
@@ -188,7 +189,10 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
 
   // Fetch all confirmed reservations from API (secure backend proxy bypassing client RLS / GDPR compliant) to compute availability
   useEffect(() => {
+    if (!isOpen) return;
+
     const fetchBookings = async () => {
+      setAvailabilityLoading(true);
       try {
         const response = await fetch('/api/availability');
         const result = await response.json();
@@ -205,32 +209,64 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
         }
       } catch (err) {
         console.error('Network error fetching occupied dates:', err);
+      } finally {
+        setAvailabilityLoading(false);
       }
     };
 
     fetchBookings();
 
-    // Subscribe to new bookings for real-time calendar updates
+    // Subscribe to all changes for real-time calendar updates
     const channel = supabase
       .channel('public:bookings')
       .on('postgres_changes', { 
-        event: 'INSERT', 
+        event: '*', 
         schema: 'public', 
         table: 'bookings' 
       }, (payload) => {
-        const newBooking = {
-          date: payload.new.booking_date,
-          seatsCount: payload.new.guest_count,
-          status: 'confirmed'
-        };
-        setReservations(prev => [...prev, newBooking]);
+        if (payload.eventType === 'INSERT') {
+          const newBooking = {
+            date: payload.new.booking_date,
+            seatsCount: payload.new.guest_count,
+            status: 'confirmed'
+          };
+          setReservations(prev => [...prev, newBooking]);
+        } else if (payload.eventType === 'DELETE') {
+          const oldBooking = payload.old;
+          if (oldBooking) {
+            setReservations(prev => prev.filter(b => 
+              !(b.date === oldBooking.booking_date && b.seatsCount === oldBooking.guest_count)
+            ));
+          }
+        } else if (payload.eventType === 'UPDATE') {
+          const oldBooking = payload.old;
+          const newBooking = payload.new;
+          if (oldBooking && newBooking) {
+            setReservations(prev => {
+              const index = prev.findIndex(b => 
+                b.date === oldBooking.booking_date && 
+                b.seatsCount === oldBooking.guest_count
+              );
+              if (index !== -1) {
+                const next = [...prev];
+                next[index] = {
+                  date: newBooking.booking_date,
+                  seatsCount: newBooking.guest_count,
+                  status: 'confirmed'
+                };
+                return next;
+              }
+              return prev;
+            });
+          }
+        }
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [isOpen]);
 
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
 
@@ -439,52 +475,58 @@ export default function BookingModal({ isOpen, onClose, lang }: BookingModalProp
                 </div>
 
                 {/* Calendar Grid */}
-                <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                  <div className="flex justify-between items-center mb-4">
-                    <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors">
-                      <ChevronLeft className="w-5 h-5 text-gray-600" />
-                    </button>
-                    <div className="text-center font-bold text-gray-700 capitalize">
-                      {viewDate.toLocaleString(lang === 'sr' ? 'sr-Latn-RS' : 'en-US', { month: 'long', year: 'numeric' })}
+                {availabilityLoading ? (
+                  <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 h-[290px] flex items-center justify-center text-gray-500 text-sm font-medium">
+                    {lang === 'sr' ? "Učitavanje dostupnih termina..." : "Loading available dates..."}
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                    <div className="flex justify-between items-center mb-4">
+                      <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors">
+                        <ChevronLeft className="w-5 h-5 text-gray-600" />
+                      </button>
+                      <div className="text-center font-bold text-gray-700 capitalize">
+                        {viewDate.toLocaleString(lang === 'sr' ? 'sr-Latn-RS' : 'en-US', { month: 'long', year: 'numeric' })}
+                      </div>
+                      <button onClick={handleNextMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors">
+                        <ChevronRight className="w-5 h-5 text-gray-600" />
+                      </button>
                     </div>
-                    <button onClick={handleNextMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors">
-                      <ChevronRight className="w-5 h-5 text-gray-600" />
-                    </button>
+                    
+                    <div className="grid grid-cols-7 gap-1 mb-2 text-center text-xs font-semibold text-gray-400">
+                      <div>{t.mo}</div><div>{t.tu}</div><div>{t.we}</div><div>{t.th}</div><div>{t.fr}</div><div>{t.sa}</div><div>{t.su}</div>
+                    </div>
+                    <div className="grid grid-cols-7 gap-1">
+                      {Array.from({ length: startOffset }).map((_, i) => (
+                        <div key={`empty-${i}`} className="h-10" />
+                      ))}
+                      {Array.from({ length: daysInMonth }).map((_, i) => {
+                        const day = i + 1;
+                        const avail = availability[day];
+                        const isSoldOut = avail === 0;
+                        const isLimited = avail > 0 && avail < 12;
+                        
+                        return (
+                          <button
+                            key={day}
+                            disabled={isSoldOut}
+                            onClick={() => handleDateSelect(day)}
+                            className={`
+                              relative h-10 rounded-lg flex items-center justify-center text-sm font-medium transition-all
+                              ${isSoldOut ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-uvac-primary/10 hover:text-uvac-primary'}
+                              ${!isSoldOut ? 'text-gray-700 bg-white shadow-sm border border-gray-100' : ''}
+                            `}
+                          >
+                            {day}
+                            {!isSoldOut && (
+                              <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isLimited ? 'bg-yellow-400' : 'bg-green-500'}`} />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                  
-                  <div className="grid grid-cols-7 gap-1 mb-2 text-center text-xs font-semibold text-gray-400">
-                    <div>{t.mo}</div><div>{t.tu}</div><div>{t.we}</div><div>{t.th}</div><div>{t.fr}</div><div>{t.sa}</div><div>{t.su}</div>
-                  </div>
-                  <div className="grid grid-cols-7 gap-1">
-                    {Array.from({ length: startOffset }).map((_, i) => (
-                      <div key={`empty-${i}`} className="h-10" />
-                    ))}
-                    {Array.from({ length: daysInMonth }).map((_, i) => {
-                      const day = i + 1;
-                      const avail = availability[day];
-                      const isSoldOut = avail === 0;
-                      const isLimited = avail > 0 && avail < 12;
-                      
-                      return (
-                        <button
-                          key={day}
-                          disabled={isSoldOut}
-                          onClick={() => handleDateSelect(day)}
-                          className={`
-                            relative h-10 rounded-lg flex items-center justify-center text-sm font-medium transition-all
-                            ${isSoldOut ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-uvac-primary/10 hover:text-uvac-primary'}
-                            ${!isSoldOut ? 'text-gray-700 bg-white shadow-sm border border-gray-100' : ''}
-                          `}
-                        >
-                          {day}
-                          {!isSoldOut && (
-                            <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isLimited ? 'bg-yellow-400' : 'bg-green-500'}`} />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                )}
 
                 {/* Legend */}
                 <div className="flex justify-center gap-4 mt-6 text-xs text-gray-500">
