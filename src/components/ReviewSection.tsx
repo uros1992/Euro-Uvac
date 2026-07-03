@@ -31,7 +31,7 @@ export default function ReviewSection(
   const visibleCount = windowWidth >= 1024 ? 3 : (windowWidth >= 640 ? 2 : 1);
 
   // Divide the limited (or all) reviews into chunks
-  const displayedReviews = reviews.slice(0, 9);
+  const displayedReviews = reviews;
   
   const chunkReviews = (arr: any[], size: number) => {
     const result = [];
